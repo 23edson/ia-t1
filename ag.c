@@ -826,8 +826,24 @@ int cruzamento(indvo *ppl1, indvo *ppl2){
 	
 	
 	}
-	 
-	testaRestricao(indvo ppl, disc_aux t, int horario)
+	for(i = 0; i < novo->qtd;i++)
+		if(novo->genes_indv[i].prof,temp.prof &&
+			novo->genes_indv[i].disc == temp.disc){
+			
+			novo->genes_indv[dv].dia_sem = temp.dia_sem;
+			strcpy(novo->genes_indv[dv].prof,temp.prof);
+			for(i = 0;  i < temp.numpref;i++)
+				novo->genes_indv[dv].notpref[i]=temp.notpref[i];
+			novo->genes_indv[dv].numpref= temp.numpref;
+			novo->genes_indv[dv].disc = temp.disc;
+			novo->genes_indv[dv].sala = temp.sala;
+			novo->genes_indv[dv].sala_id = temp.sala_id;
+			novo->genes_indv[dv].periodo; = temp.periodo;
+			strcpy(novo->genes_indv[dv].sem,temp.sem);
+			break;
+		
+		} 
+	testaRestricao(&novo, disc_aux t, int horario)
 	
 }
 //nao finalizado/
