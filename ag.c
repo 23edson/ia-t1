@@ -1151,6 +1151,15 @@ void geraIndividuos(indvo *ppl, char *arq){
 	
 	//imprime(&ppl,dsa);
 	avaliacao(ppl);
+
+	free(v);
+	free(salasd);
+	freeMem(auxsm,SEMESTRE);
+	freeMem(sm,SEMESTRE);
+	freeMem(dsa,DISC_AUX);
+	freeMem(pf,PROF_AUX);
+	freeMem(ppl,PLCAO);
+	
 	//printf("Quebra: %d prf >: %d", ppl->individuos[0].choques, ppl->individuos[0].qtdpr);	
 	//puts("okeeee");	
 	//if(mutacao(&ppl->individuos[0])){
@@ -1161,6 +1170,68 @@ void geraIndividuos(indvo *ppl, char *arq){
 	//	puts("ok");	
 	
 }
+void freeMem(void *algo,int component){ /// Liberar memoria alocadas de cada estrutura separadamente
+	int i;
+	if(algo == NULL){
+		printf("Nada para Limpar nesse %d.\n",component);
+		return;
+	}
+	switch(component) {
+		case DISC_AUX :{   /// "disc_aux"
+			disc_aux *a = (disc_aux *)algo;
+			for(i=0;i<qtddisc;i++)
+				free(a[i].nome);
+			free(a);
+			a=NULL;
+			break;
+		}
+		case SEMESTRE:{   /// "semestre"
+			semestre *a = (semestre *)algo;
+			for(i=0;i<qtdsem;i++)
+				free(a[i].horarios);
+			free(a);
+			a=NULL;
+			break;
+		}
+		case PROF_AUX:{   /// "prof_aux"
+			prof_aux *a = (prof_aux *)algo;
+			for(i=0;i<qtdprof;i++){
+				free(a[i].horarios);
+				free(a[i].nome);
+			}
+			free(a);
+			a=NULL;
+			break;
+		}	
+		case PLCAO:{   /// "plcao"
+			plcao *a = (plcao *)algo;
+			freeMem(a->individuos,INDVO);
+			free(a);
+			break;
+		}	
+		case INDVO:{   /// "indvo"
+			indvo *a = (indvo *)algo;
+			for(i=0;i<TAM_POPULACAO;i++)
+				freeMem(a[i].genes_indv,GENES);
+			free(a);
+			break;
+		}
+		case GENES:{   /// "genes"
+			genes *a = (genes *)algo;
+			for(i=0;i<150;i++){
+				free(a[i].prof);
+				free(a[i].notpref);
+			}
+			free(a);
+			break;
+		}
+		default:{
+			printf("Componente nao identificado");
+			break;
+		}
+	}
+}
+
 int main(int argc, char *argv[ ] ){
 	int i= 0;
 	//printf("%s", argv[1]);
@@ -1177,7 +1248,7 @@ int main(int argc, char *argv[ ] ){
 	//populacao->individuos = (indvo *)malloc(sizeof(indvo));
 	//populacao->individuos->genes_indv = (genes *)malloc(sizeof(genes));
 	//populacao->individuos->genes_indv->notpref = (int *)malloc(sizeof(int)*5);
-	
+	freeMem(populacao,PLCAO);
 	//geraIndividuos(populacao,argv[1]);
 	
 	//	populacao = (plcao *)malloc(sizeof(plcao));

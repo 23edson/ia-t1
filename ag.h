@@ -11,6 +11,14 @@
 //#define QTDDISC//
 //#define QTDSALA 
 
+//para freeMem
+#define SEMESTRE 101
+#define PROF_AUX 102
+#define DISC_AUX 103
+#define PLCAO 104
+#define INDVO 105
+#define GENES 106
+
 int qtdprof,qtdsem,qtddisc;
 int posicao_arq;
 
@@ -80,3 +88,5 @@ semestre *leSemestre(char arq[20]);
 disc_aux *leDisciplina(char arq[20]);
 
 int testaParada(int *v);
+
+void freeMem(void *algo,int component);
