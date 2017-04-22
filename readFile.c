@@ -117,6 +117,7 @@ semestre *leSemestre(char arq[20]){
 	}
 	
 	posicao_arq = ftell(arqi);
+	backup = posicao_arq;
 	fclose(arqi);
 	free(t);
 	return semn;	

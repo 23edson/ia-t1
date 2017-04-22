@@ -4,7 +4,11 @@
 #include <time.h>
 
 #define TAM_POPULACAO 10
+
 #define ERRONALEITURA 1
+#define ERROMUTACAO 3
+#define ERROCRUZAMENTO 4
+#define ERROALOCACAO 5
 #define OK 2
 
 //#define QTDPROF
@@ -20,7 +24,7 @@
 #define GENES 106
 
 int qtdprof,qtdsem,qtddisc;
-int posicao_arq;
+int posicao_arq,backup;
 
 //int tam_populacao = 10;
 

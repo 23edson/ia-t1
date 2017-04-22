@@ -4,12 +4,24 @@
 #include <time.h>
 
 #define TAM_POPULACAO 10
+
 #define ERRONALEITURA 1
+#define ERROMUTACAO 3
+#define ERROCRUZAMENTO 4
+#define ERROALOCACAO 5
 #define OK 2
 
 //#define QTDPROF
 //#define QTDDISC//
 //#define QTDSALA 
+
+//para freeMem
+#define SEMESTRE 101
+#define PROF_AUX 102
+#define DISC_AUX 103
+#define PLCAO 104
+#define INDVO 105
+#define GENES 106
 
 int qtdprof,qtdsem,qtddisc;
 int posicao_arq;
@@ -78,3 +90,7 @@ typedef struct disc{
 prof_aux *leProfessores(char arq[20]);
 semestre *leSemestre(char arq[20]);
 disc_aux *leDisciplina(char arq[20]);
+
+int testaParada(int *v);
+
+void freeMem(void *algo,int component);
