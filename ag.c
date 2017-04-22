@@ -972,18 +972,22 @@ int geraIndividuos(indvo *ppl, char *arq){
 	
 	
 	pf = leProfessores(arq);
+	if(!pf){freeMem(ppl,INDVO); return ERROALOCACAO;}
 	sm = leSemestre(arq);
-	
+	if(!sm){freeMem(ppl,INDVO); freeMem(pf,PROF_AUX); return ERROALOCACAO;}
+	dsa = leDisciplina(arq);//nao tem pra que retirar essa linha sendo que essa variavel, nao e global e esta sendo usada nos strcmp abaixo.
+	if(!dsa){freeMem(ppl,INDVO); freeMem(pf,PROF_AUX);  freeMem(sm,SEMESTRE); return ERROALOCACAO;}
 	auxsm = copiaEst(sm);
+	if(!auxsm){freeMem(ppl,INDVO); freeMem(pf,PROF_AUX);  freeMem(sm,SEMESTRE);  freeMem(dsa,DISC_AUX); return ERROALOCACAO;}
 	
 	printf("primeir");
 	for(i = 0; i < auxsm[5].num;i++)
 	printf("%d ", auxsm[5].horarios[i]);
 				printf("\n");	
 	int *v = (int *)malloc(sizeof(int)*qtddisc);
-	if(!v)return ERROALOCACAO;
+	if(!v){freeMem(ppl,INDVO);freeMem(pf,PROF_AUX);freeMem(sm,SEMESTRE);freeMem(dsa,DISC_AUX);freeMem(auxsm,SEMESTRE); return ERROALOCACAO;}
 	int *salasd = (int *)malloc(sizeof(int)*30);
-	
+	if(!salasd){ freeMem(ppl,INDVO);freeMem(pf,PROF_AUX);freeMem(sm,SEMESTRE);freeMem(dsa,DISC_AUX);freeMem(auxsm,SEMESTRE); free(v); return ERROALOCACAO;}
 	for(i =0 ; i < qtddisc;i++){
 		v[i] = dsa[i].periodo; 
 		//printf("%d ", v[i]);
@@ -1177,9 +1181,9 @@ int geraIndividuos(indvo *ppl, char *arq){
 	free(salasd);
 	freeMem(auxsm,SEMESTRE);
 	freeMem(sm,SEMESTRE);
-	//freeMem(dsa,DISC_AUX);
+	freeMem(dsa,DISC_AUX);
 	freeMem(pf,PROF_AUX);
-	freeMem(ppl,PLCAO);
+	//freeMem(ppl,PLCAO);
 	
 	//printf("Quebra: %d prf >: %d", ppl->individuos[0].choques, ppl->individuos[0].qtdpr);	
 	//puts("okeeee");	
@@ -1209,7 +1213,8 @@ void freeMem(void *algo,int component){ /// Liberar memoria alocadas de cada est
 		case SEMESTRE:{   /// "semestre"
 			semestre *a = (semestre *)algo;
 			for(i=0;i<qtdsem;i++)
-				free(a[i].horarios);
+				if(a[i].horarios!=NULL)
+					free(a[i].horarios);
 			free(a);
 			a=NULL;
 			break;
@@ -1217,7 +1222,9 @@ void freeMem(void *algo,int component){ /// Liberar memoria alocadas de cada est
 		case PROF_AUX:{   /// "prof_aux"
 			prof_aux *a = (prof_aux *)algo;
 			for(i=0;i<qtdprof;i++){
+				if(a[i].horarios!=NULL)
 				free(a[i].horarios);
+				if(a[i].nome!=NULL)
 				free(a[i].nome);
 			}
 			free(a);
@@ -1228,6 +1235,7 @@ void freeMem(void *algo,int component){ /// Liberar memoria alocadas de cada est
 			plcao *a = (plcao *)algo;
 			freeMem(a->individuos,INDVO);
 			free(a);
+			a=NULL;
 			break;
 		}	
 		case INDVO:{   /// "indvo"
@@ -1240,8 +1248,10 @@ void freeMem(void *algo,int component){ /// Liberar memoria alocadas de cada est
 		case GENES:{   /// "genes"
 			genes *a = (genes *)algo;
 			for(i=0;i<150;i++){
-				free(a[i].prof);
-				free(a[i].notpref);
+				if(a[i].prof!=NULL)
+					free(a[i].prof);
+				if(a[i].notpref!=NULL)
+					free(a[i].notpref);
 			}
 			free(a);
 			break;
@@ -1262,7 +1272,6 @@ int main(int argc, char *argv[ ] ){
 	
 	populacao = (plcao *)malloc(sizeof(plcao));
 	populacao->individuos = (indvo *)malloc(sizeof(indvo)*TAM_POPULACAO);
-	dsa = leDisciplina(argv[1]);
 	geraIndividuos(&populacao->individuos[0],argv[1]);
 	geraIndividuos(&populacao->individuos[1],argv[1]);
 	cruzamento(&populacao->individuos[0],&populacao->individuos[1]);

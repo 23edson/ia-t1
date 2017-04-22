@@ -53,13 +53,15 @@ prof_aux *leProfessores(char arq[20]){
 	char a[6];
 	char aux;
 	char *t = (char *)malloc(sizeof(char)*20);	
+	if(!t) {printf("Alocacao professores t"); return NULL;}
 	FILE *arqi;
 	prof_aux *pf;
 	
 	arqi = fopen(arq,"r");
-	if(!arqi) {printf("Erro na leitura"); return NULL;}
+	if(!arqi) {printf("Erro na leitura"); free(t); return NULL;}
 	fscanf (arqi, "%d", &qtdprof);
 	pf = (prof_aux *)malloc(sizeof(prof_aux)*qtdprof);
+	if(!t) {printf("Alocacao professores"); free(t); return NULL;}
 //printf("%d\n", qtdprof);
 	//printf("%d\n", i); 
 	//printf("%ld\n", ftell(arqi));
@@ -68,10 +70,12 @@ prof_aux *leProfessores(char arq[20]){
 		fscanf(arqi,"%s %d", t, &ii);
 	//	printf("%s %d\n", t,ii);
 		pf[j].nome = (char *)malloc(sizeof(char)*strlen(t));
+		if(!pf[j].nome) {printf("Alocacao professores %d nome",j); freeMem(pf,PROF_AUX);return NULL;}
 		strcpy(pf[j].nome,t);
 		if(ii == 0) pf[j].horarios = NULL;
-		else
+		else{
 			pf[j].horarios = (int *)malloc(sizeof(int)*ii);
+			if(!pf[j].horarios) {printf("Alocacao professores %d horarios",j);freeMem(pf,PROF_AUX); return NULL;}}
 		pf[j].num = ii;
 		
 		for(k =0;k<ii;k++){
@@ -93,18 +97,21 @@ semestre *leSemestre(char arq[20]){
 	FILE *arqi;
 	semestre *semn;
 	char *t = (char *)malloc(sizeof(char)*5);	
+	if(!t) {printf("Alocacao semestre t"); return NULL;}
 	int ii,i,j,k,l;
 	arqi = fopen(arq,"r");
-	if(!arqi) {printf("Erro na leitura"); return NULL;}
+	if(!arqi) {printf("Erro na leitura"); free(t); return NULL;}
 	fseek(arqi,posicao_arq+1,SEEK_CUR);
 	fscanf (arqi, "%d", &qtdsem);
 	semn = (semestre *)malloc(sizeof(semestre)*qtdsem);
+	if(!semn) {printf("Alocacao semestre"); free(t); return NULL;}
 	//printf("%d", qtdsem);
 	for(i = 0;i<qtdsem;i++){
 		fscanf(arqi,"%s %d %d", t, &ii,&l);
 		strcpy(semn[i].se,t);
 		semn[i].sala = ii;
 		semn[i].horarios = (int *)malloc(sizeof(int)*l); // ao inves de "*ii" vamos usar *l pois não precisa mais do que o numero de horarios que está disponivel para utilizar.
+		if(!semn[i].horarios) {printf("Alocacao semestre %d horarios",i); freeMem(semn,SEMESTRE); free(t); return NULL;}
 		semn[i].num = l;
 		for(j = 0;j < l;j++){
 			fscanf(arqi,"%d", &k);
@@ -129,16 +136,20 @@ disc_aux *leDisciplina(char arq[20]){
 	disc_aux *discc;
 	int i,j,k;
 	char *t = (char *)malloc(sizeof(char)*5);	
+	if(!t) { printf("Alocacao disciplina t  "); return NULL;}
 	char *t2 = (char *)malloc(sizeof(char)*5);	
+	if(!t2) {printf("Alocacao disciplina t2 "); free(t); return NULL;}
 	char *t1 = (char *)malloc(sizeof(char)*20);
-	
+	if(!t1) {printf("Alocacao disciplina t1 "); free(t); free(t2); return NULL;}
+
 	arqi = fopen(arq,"r");
-	if(!arqi) {printf("Erro na leitura"); return NULL;}
+	if(!arqi) {printf("Erro na leitura"); free(t); free(t2); free(t1); return NULL;}
 	fseek(arqi,posicao_arq+1,SEEK_CUR);
 
 	fscanf (arqi, "%d", &qtddisc);
 	discc = (disc_aux *)malloc(sizeof(disc_aux)*qtddisc);
-
+	if(!discc) {printf("Alocacao disciplina"); free(t); free(t2); free(t1); return NULL;}
+	
 
 	for(i = 0; i < qtddisc;i++){
 		fscanf(arqi,"%s %d %s %s", t, &j,t2,t1);
@@ -146,6 +157,7 @@ disc_aux *leDisciplina(char arq[20]){
 		discc[i].periodo = j;
 		strcpy(discc[i].cod_sem,t2);
 		discc[i].nome = (char *)malloc(sizeof(char)*strlen(t1));
+		if(!discc[i].nome) {printf("Alocacao disciplina %d nome",i); freeMem(discc,DISC_AUX); free(t); free(t2); free(t1);  return NULL;}
 		strcpy(discc[i].nome,t1);
 	
 	
