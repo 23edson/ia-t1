@@ -32,7 +32,7 @@ int somadisc = 62;
 int primeiro  =1;
 int aux;
 int par,impar;
-
+int contador = 0;
 //Variaveis comuns
 prof_aux *pf;
 semestre *sm;
@@ -295,6 +295,7 @@ int *copiaVetor(int *a, int *b, int tam){
 	int i;
 	
 	a = (int *)malloc(sizeof(int)*tam);
+	if(!a)return NULL;
 	for(i = 0; i < tam;i++){
 		a[i] = b[i];	
 	
@@ -965,7 +966,8 @@ indvo *cruzamento(indvo *ppl1, indvo *ppl2){
 	genes *temp = (genes *)malloc(sizeof(genes)*150);
 	if(!temp)return NULL;
 	
-	srand(time(NULL));
+	srand(time(NULL)+contador);
+	contador+=10;
 	int esc = rand()%2;
 	if(!esc)
 		novo = criaIndv(ppl1);
@@ -1330,6 +1332,7 @@ indvo *cruzamento(indvo *ppl1, indvo *ppl2){
 	//novo->genes_indv[ki].prof = (char *)malloc(sizeof(char)*20);
 	strcpy(novo->genes_indv[ki].prof,temp->prof);//puts(temp->prof);
 	free(novo->genes_indv[ki].notpref);//puts("inde6");
+	novo->genes_indv[ki].notpref = NULL;
 	novo->genes_indv[ki].notpref = (int *)malloc(sizeof(int)*temp->numpref);//puts("inde7");
 	for(j = 0;  j < temp->numpref;j++)
 		novo->genes_indv[ki].notpref[j]=temp->notpref[j];
@@ -1492,6 +1495,8 @@ int geraIndividuos(indvo *ppl, char *arq){
 	//plcao *ppl = NULL;
 	
 	ppl->qtd =0;
+	ppl->choques = 0;
+	ppl->qtdpr = 0;
 	ppl->genes_indv = (genes *)malloc(sizeof(genes)*150);
 	if(!ppl->genes_indv)return ERROALOCACAO;
 	
@@ -1528,7 +1533,8 @@ int geraIndividuos(indvo *ppl, char *arq){
 
 	
 	discomp = testaParada(v);
-	srand(time(NULL));
+	srand(time(NULL) + contador);
+	contador+=10;
 	int x = 0;
 	
 	while(discomp){
@@ -1615,11 +1621,13 @@ int geraIndividuos(indvo *ppl, char *arq){
 				
 			strcpy(ppl->genes_indv[ppl->qtd].prof,dsa[j].nome);
 						
-			test = achaProf(pf,dsa[j].nome);			
+			test = achaProf(pf,dsa[j].nome);
+			ppl->genes_indv[ppl->qtd].notpref = NULL;		
 			ppl->genes_indv[ppl->qtd].notpref = 
 					copiaVetor(ppl->genes_indv[ppl->qtd].notpref,
 					pf[test].horarios, pf[test].num);		
-		
+			if(!ppl->genes_indv[ppl->qtd].notpref)
+				return ERROALOCACAO;		
 			ppl->genes_indv[ppl->qtd].numpref = pf[test].num;
 			ppl->genes_indv[ppl->qtd].disc = j;
 			ppl->genes_indv[ppl->qtd].sala = sm[numsala].sala;
@@ -1667,7 +1675,8 @@ int geraIndividuos(indvo *ppl, char *arq){
 	}
 	
 	quicksort2(ppl->genes_indv,0,ppl->qtd-1);
-	avaliacao(ppl);
+	//printf("aval %d", ppl->qtdpr+ppl->choques);
+	avaliacao(ppl);//printf("aval2 %d", ppl->qtdpr+ppl->choques);
 	
 	return OK;
 }
@@ -1685,21 +1694,22 @@ int geraIndividuos(indvo *ppl, char *arq){
  **/ 
 int eliminaPior(plcao *pop, indvo *ppl){
 	int i,j,id=0;
-	int maior = 0;puts("te;;");
+	int maior = 0;
 	for(i = 0; i < 2;i++){
 		if(pop->individuos[i].qtdpr + pop->individuos[i].choques > maior){
 			maior = pop->individuos[i].qtdpr + pop->individuos[i].choques;
 			id = i;
 		}
 	
-	}printf("%d\n", id);puts("te");
-	pop->individuos[id].qtdpr = ppl->qtdpr;puts("tezz");
-	pop->individuos[id].choques = ppl->choques;puts("tea");
-	pop->individuos[id].qtd = ppl->qtd;puts("te55");
+	}
+	pop->individuos[id].qtdpr = ppl->qtdpr;
+	pop->individuos[id].choques = ppl->choques;
+	pop->individuos[id].qtd = ppl->qtd;
 	for(i = 0; i < ppl->qtd;i++){
 		pop->individuos[id].genes_indv[i].dia_sem = ppl->genes_indv[i].dia_sem;
 		strcpy(pop->individuos[id].genes_indv[i].prof, ppl->genes_indv[i].prof);
-		free(pop->individuos[id].genes_indv[i].notpref);
+		
+		
 		pop->individuos[id].genes_indv[i].notpref = (int *)malloc(sizeof(int)*ppl->genes_indv[i].numpref);
 		for(j = 0; j < ppl->genes_indv[i].numpref; j++)
 			pop->individuos[id].genes_indv[i].notpref[j] = ppl->genes_indv[i].notpref[j];
@@ -1711,10 +1721,22 @@ int eliminaPior(plcao *pop, indvo *ppl){
 		strcpy(pop->individuos[id].genes_indv[i].sem , ppl->genes_indv[i].sem);
 			
 	}
-	puts("tett");
+	
 	return OK;
 }
 
+/**
+ * @function achaMelhor
+ *
+ * @param plcao *pop - struct que contem toda a população
+ * 
+ *
+ * A função procura na população um individuo com a melhor pontuação, isto é,
+ * com a menor soma de penalidades, assim posteriormente este individuo é 
+ * impresso na tela como resultado final após a execução do número de 
+ * gerações.
+ * 
+ **/
 int achaMelhor(plcao *pop){
 	int i,j,id = 0;
 	int menor = 999;
@@ -1722,7 +1744,9 @@ int achaMelhor(plcao *pop){
 		if(pop->individuos[i].qtdpr + pop->individuos[i].choques < menor){
 			menor = pop->individuos[i].qtdpr + pop->individuos[i].choques;
 			id = i;
+			
 		}
+		
 	}
 	
 	return id;
@@ -1809,9 +1833,7 @@ void freeMem(void *algo,int component){ /// Liberar memoria alocadas de cada est
 int main(int argc, char *argv[ ] ){
 	int i,j;
 	int sp,pp;
-	//printf("%s", argv[1]);
-	//char a = argv[0];
-//	char *t[];
+
 	plcao *populacao;
 	indvo *new;
 	populacao = (plcao *)malloc(sizeof(plcao));
@@ -1821,9 +1843,10 @@ int main(int argc, char *argv[ ] ){
 	if(!populacao->individuos)return ERROALOCACAO;
 	
 	for(i = 0 ; i < TAM_POPULACAO;){
-		if(geraIndividuos(&populacao->individuos[i],argv[1])==OK)i++;
+		if(geraIndividuos(&populacao->individuos[i],argv[1])==OK){i++;}
 	
-	}
+		
+	}//return 2;
 	srand(time(NULL));
 	for(i = 0 ; i < GERACOES;i++){
 		for(j = 0; j < TORNEIO;j++){
@@ -1850,19 +1873,6 @@ int main(int argc, char *argv[ ] ){
 	}
 	int id = achaMelhor(populacao);
 	imprime(&populacao->individuos[id]);
-	//int h;
-	//sp = geraIndividuos(&populacao->individuos[0],argv[1]);
-	//pp = geraIndividuos(&populacao->individuos[1],argv[1]);
-	//if(sp == OK){
-		//imprime(&populacao->individuos[0]);	
-	//	for(h = 0; h < 1500;h++)		
-	//		mutacao(&populacao->individuos[0]);
-	//	imprime(&populacao->individuos[0]);	
-	//}
-	/*if(sp == OK && pp == OK)
-		icruzamento(&populacao->individuos[0],&populacao->individuos[1])!=NULL)printf("cruzado");
-		else printf("nao");
-
-	*/
+	
 	return 0;
 }
