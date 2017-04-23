@@ -9,6 +9,7 @@
 #define ERROMUTACAO 3
 #define ERROCRUZAMENTO 4
 #define ERROALOCACAO 5
+#define ERROINDIVIDUO 6
 #define OK 2
 
 //#define QTDPROF
