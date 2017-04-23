@@ -1,3 +1,25 @@
+
+/**
+*   Universidade Federal da Fronteira Sul
+*
+*   TRABALHO I
+*   Disciplina: Inteligência Artificial
+*   Professor: José Carlos Bins Filho
+*
+*
+* 	 Alunos : Edson Lemes da Silva & Lucas Cezar Parnoff
+*  
+*   
+*  O trabalho consiste em aplicar o algoritmo genético para
+*  gerar a melhor grade de horários possível do Curso de Ciência
+*  da Computação, levando em conta as disciplinas do semestre vigente.
+*  A busca pelo melhor resultado refere-se na análise das preferências
+*  dos professores e na menor distribuição dos horários na grade escolar.
+*
+*
+**/
+
+
 #include "ag.h"
 #define UM_PONTO 1
 #define DOIS_PONTOS 2
@@ -11,10 +33,34 @@ int primeiro  =1;
 int aux;
 int par,impar;
 
+//Variaveis comuns
 prof_aux *pf;
 semestre *sm;
 disc_aux *dsa;
 semestre *auxsm;
+
+/**
+ * @function avaliacao
+ *
+ * @param indvo *ppl - recebe um individuo como parâmetro.
+ *
+ * A função é responsável por avaliar (fitness) o quão bom é o individuo em relação
+ * aos horários da grade escolar. A análise ocorre através de quatro situações:
+ * 1 : horários de mesma disciplina e mesmo professor que estão muito distribuídos recebem
+ *		 1 ponto de penalidade.
+ * 2 : períodos consecutivos de mesma disciplina são penalizados com
+ *		 quatro pontos ao número de ocorrências.
+ *	3 : Contabiliza os horários não preferidos pelos professores, a penalidade
+ *		 para este caso é de um ponto.
+ *	4 : Verifica a ocorrência de um mesmo professor dos quais estão selecionados
+ *		 para horários de manhã e noite no mesmo dia. Para este caso, a penalidade
+ *		 sobre as ocorrências é de dois pontos.
+ *		 
+ * A partir dessas situações, os valores são somados para fazer a avaliação
+ *	posterior.
+ * A função devolve OK, se a soma foi feita corretamente.	   	 
+ * 
+ **/ 
 
 int  avaliacao(indvo *ppl){
 
@@ -73,7 +119,6 @@ int  avaliacao(indvo *ppl){
 		}
 		if(tam > 1)
 			soma+=tam*QUATRO_PONTOS;
-		//printf("soma %d", soma);
 	}
 	ppl->qtdpr = soma;
 	
@@ -118,36 +163,7 @@ int  avaliacao(indvo *ppl){
 				hora[tam] = ppl->genes_indv[j].dia_sem;
 				hora2[tam++] = 1;
 			}
-			/*if(!flag){
-				dia = ppl->genes_indv[j].dia_sem;
-				flag = 1;			
-			}
 			
-			else if(strcmp(nome,ppl->genes_indv[j].prof)==0 && flag ==1){
-								
-				if(ppl->genes_indv[j].dia_sem==0 || ppl->genes_indv[j].dia_sem==1){
-					if(dia==20 || dia==21)				
-						tam++;				
-				}
-				else if(dia==4 || dia==5){
-					if(ppl->genes_indv[j].dia_sem==24 || ppl->genes_indv[j].dia_sem==25)				
-						tam++;				
-				
-				}
-				else if(ppl->genes_indv[j].dia_sem==8 || ppl->genes_indv[j].dia_sem==9)
-					if(dia==28 || dia==29)				
-						tam ++;
-				else if(ppl->genes_indv[j].dia_sem==2 || ppl->genes_indv[j].dia_sem==3)
-					if(dia==22 || dia==23)				
-						tam++;				
-				
-				else if(ppl->genes_indv[j].dia_sem==6 || ppl->genes_indv[j].dia_sem==7)
-					if(dia==26 || dia==27)				
-						tam++;
-			
-				dia = ppl->genes_indv[j].dia_sem;
-			}*/
-		
 		
 		}
 		int l;
@@ -157,21 +173,18 @@ int  avaliacao(indvo *ppl){
 			//if(hora2[k] == 0)break;
 			//if(hora2[k] == 0)continue;
 			for(l = 0; l < tam;l++){
-				
-				//if(strcmp(nome,"Braulio")==0){				
-				//	printf("count %d %d %d %d / ", count,hora[l],k,l);}
-					if(hora2[l] == 0)continue;
-					if(k!=l){
-						if(hora[l] == 20 || hora[l] == 21)
-							if(count == 0 || count == 1){aparece++; hora2[l] = 0;}
-						if(hora[l] == 28 || hora[l] == 29)
-							if(count == 8 || count == 9){aparece++; hora2[l] = 0;}
-						if(hora[l] == 22 || hora[l] == 23)
-							if(count == 2 || count == 3){aparece++; hora2[l] = 0;}
-						if(hora[l] == 26 || hora[l] == 27)
-							if(count == 6 || count == 7){aparece++; hora2[l] = 0;}
-						if(hora[l] == 24 || hora[l]==25 ){
-							if(count == 4 || count==5){aparece++; hora2[l] = 0;}
+				if(hora2[l] == 0)continue;
+				if(k!=l){
+					if(hora[l] == 20 || hora[l] == 21)
+						if(count == 0 || count == 1){aparece++; hora2[l] = 0;}
+					if(hora[l] == 28 || hora[l] == 29)
+						if(count == 8 || count == 9){aparece++; hora2[l] = 0;}
+					if(hora[l] == 22 || hora[l] == 23)
+						if(count == 2 || count == 3){aparece++; hora2[l] = 0;}
+					if(hora[l] == 26 || hora[l] == 27)
+						if(count == 6 || count == 7){aparece++; hora2[l] = 0;}
+					if(hora[l] == 24 || hora[l]==25 ){
+						if(count == 4 || count==5){aparece++; hora2[l] = 0;}
 					}
 				}
 					
@@ -184,9 +197,25 @@ int  avaliacao(indvo *ppl){
 	return OK;
 
 }
+
+/**
+ * @function testaRestricao
+ *
+ * @param indvo ppl - Recebe individuo como parâmetro.
+ * @param disc_aux t - struct auxiliar onde estão as disciplinas.
+ * @param int horario - Horário para o teste.
+ *
+ * A função verifica se a disciplina a ser adiciona respeita a 
+ * restrição. Caso a verificação dê negativo, a função devolve 0;
+ * senão devolve 1.
+ * Os pares de horários não permitidos são : (21,02) , (23,04), (25,06), (27,08).
+ * 
+ * 
+ **/ 
+ 
 int testaRestricao(indvo ppl, disc_aux t, int horario){
 
-	//pares nao permitido (21,02) , (23,04), (25,06), (27,08)
+	
 	int i;
 	for(i = 0; i<ppl.qtd;i++){
 			if(ppl.genes_indv[i].dia_sem == 21 ){
@@ -249,6 +278,18 @@ int testaRestricao(indvo ppl, disc_aux t, int horario){
 
 
 }
+
+/**
+ * @function copiaVetor
+ *
+ * @param int *a - Variável que recebe a cópia
+ * @param int *b - variável do qual sera copiado.
+ * @param int tam - Tamanho de b
+ *
+ * Esta é uma função auxiliar, da qual realiza a 
+ *	copia de um vetor para outro.
+ * 
+ **/
 int *copiaVetor(int *a, int *b, int tam){
 
 	int i;
@@ -264,6 +305,15 @@ int *copiaVetor(int *a, int *b, int tam){
 
 }
 
+/**
+ * @function achaSala
+ *
+ * @param char *s1 - String contendo o semestre a ser pesquisado.
+ * 
+ * A função retorna um valor inteiro que representa a posição de 
+ * cada semestre no vetor de semestres. 
+ * 
+ **/
 int achaSala(char *s1){
 
 	int i;
@@ -284,6 +334,15 @@ int achaSala(char *s1){
 	return -1;
 }
 
+/**
+ * @function achaProf
+ *
+ * @param prof_aux *pf - vetor onde foi lido os professores do arquivo curso.dat
+ * @param char *nome - String contento  o nome a ser pesquisado.
+ *
+ * A função devolve o índice no vetor onde esta o professor lido.
+ * 
+ **/
 int achaProf(prof_aux *pf, char *nome){
 
 	int i;
@@ -295,7 +354,15 @@ int achaProf(prof_aux *pf, char *nome){
 
 }
 
-//Copia vetor semestre
+/**
+ * @function copiaEst
+ *
+ * @param semestre *ss - recebe vetor de semestres a ser copiado.
+ *
+ * A função devolve uma cópia do vetor semestre *ss 
+ * 
+ **/
+
 semestre *copiaEst(semestre *ss){
 
 	semestre *aux;
@@ -315,31 +382,39 @@ semestre *copiaEst(semestre *ss){
 
 }
 
-//gera uma sala aleatoria
+/**
+ * @function geraSala
+ *
+ * @param semestre *aux - Recebe um vetor do tipo semestre
+ * @param int n - posição no vetor semestre *aux
+ *
+ * A função gera um valor em sequência no vetor aux, este valor 
+ * posteriormente será usado para geração dos horários iniciais.
+ * 
+ **/
 
 int geraSala(semestre *aux, int n){
 
 	int i;
 	int g;
-	//printf("%d %d", aux[n].num,n);puts("oi");
-	//srand((unsigned) time(NULL));
-	//srand(time(NULL));	
-	//g = rand() % aux[n].num;
-	//printf("g : %d, %d, %d , hor: %d\n", g,aux[n].num,n,aux[n].horarios[g]); 
-	//return 1;
 	
 	for(i = 0; i < aux[n].num;i++)
 		if(aux[n].horarios[i] >= 0) return i;	
 	
-	
-	
-		
 	return -1;		
 	
-	
-
-
 }
+
+/**
+ * @function testaParada
+ *
+ * @param int *v - recebe um vetor de inteiros
+ * 
+ * A função testa a parada do laço da função onde são gerados os horários.
+ * A condição de parada se dá quando todos os horários já foram colocados 
+ * na grade gerada. 
+ * 
+ **/
 int testaParada(int *v){
 
 	int i;
@@ -352,6 +427,21 @@ int testaParada(int *v){
 
 
 }
+
+/**
+ * @function quicksort2
+ *
+ * @param genes *vetor - Recebe um vetor do tipo genes 
+ * @param int inicio - posição inicial no vetor
+ * @param fim - última posição do vetor
+ *
+ *	Função Quicksort para a ordenação dos genes de um indivíduos,
+ * no vetor a ordenado ocorre em cima do período selecionado.
+ *  
+ * //codigo quicksort em: 
+ * //https://www.vivaolinux.com.br/script/Ordenacao-QuickSort
+ * 
+ **/
 void quicksort2(genes *vetor, int inicio, int fim){
    
    int pivo, aux, i, j, meio,k;
@@ -410,38 +500,19 @@ void quicksort2(genes *vetor, int inicio, int fim){
 
 }
 
-/*
-//codigo quicksort em: 
-//https://www.vivaolinux.com.br/script/Ordenacao-QuickSort
 
-void quicksort(int *vetor, int inicio, int fim){
-   
-   int pivo, aux, i, j, meio;
-   
-   i = inicio;
-   j = fim;
-   
-   meio = (int) ((i + j) / 2);
-   pivo = vetor[meio];
-   
-   do{
-      while (vetor[i] < pivo) i = i + 1;
-      while (vetor[j] > pivo) j = j - 1;
-      
-      if(i <= j){
-         aux = vetor[i];
-         vetor[i] = vetor[j];
-         vetor[j] = aux;
-         i = i + 1;
-         j = j - 1;
-      }
-   }while(j > i);
-   
-   if(inicio < j) quicksort(vetor, inicio, j);
-   if(i < fim) quicksort(vetor, i, fim);   
+/**
+ * @function imprimeaux
+ *
+ * @param indvo *ppl - Vetor do tipo indivíduo
+ * @param char semestre - Recebe o semestre a ser testado.
+ * 
+ * Esta é uma função auxiliar para a função de impressão, ela
+ * selecionada no vetor ppl todas as posições referentes ao
+ * semestre. 
+ * 
+ **/ 
 
-}
-*/
 int *imprimeaux(indvo *ppl, char semestre[4]){
 	int i,j;
 	aux = 0;
@@ -467,6 +538,20 @@ int *imprimeaux(indvo *ppl, char semestre[4]){
 	}
 	return v;
 }
+
+
+/**
+ * @function imprimeaux2
+ *
+ * @param indvo *ppl - Vetor do tipo indivíduo
+ * @param int *v - Vetor calculado na função imprimeaux
+ * @param char turn - carácter referente ao turno matutino ou noturno.
+ *
+ * A função permite formar um vetor útil para imprimir os horários em forma
+ * de tabela. Sendo assim, os horários onde não estão nos genes gerados,
+ * é colocado uma flag de -1 para não imprimir posteriormente.  
+ * 
+ **/ 
 int *imprimeaux2(indvo *ppl, int * v, char turn){
 	int j = 0;
 	int i,k;
@@ -478,16 +563,10 @@ int *imprimeaux2(indvo *ppl, int * v, char turn){
 		
 		v1[i] = ppl->genes_indv[v[i]].dia_sem;	
 	}
-	//for(i = 0; i < aux; i++)printf("%d ", v[i]);
-		//printf("\n");
-		
-		//for(i = 0; i < aux; i++)printf("%d ", v1[i]);
-	//printf("\n");
-	//printf("\naux\n %d", aux);
+	//Caso for um semestre matutino
 	if(turn == 'M'){
 		temp = 0;
-	//	puts("teste");
-	//	printf("aux %d", aux);
+	
 		//Copia valores pares menores que 10
 		for(i = 0; i < aux; i++){
 			if((v1[i]%2 == 0 && v1[i] < 10) && v1[i]==temp){
@@ -500,7 +579,7 @@ int *imprimeaux2(indvo *ppl, int * v, char turn){
 				j++;i--;temp+=2;			
 			
 			}
-		//printf("ll %d\n", v2[1]);	
+			
 		}
 		if(v1[i-1] < 8){
 			if(j == 0){
@@ -576,7 +655,7 @@ int *imprimeaux2(indvo *ppl, int * v, char turn){
 				j++;i--;temp+=2;			
 			
 			}	
-		//printf("ll %d\n", v2[1]);	
+			
 		}
 		if(v1[i-1] < 18){
 			if(j == 11){
@@ -602,8 +681,7 @@ int *imprimeaux2(indvo *ppl, int * v, char turn){
 		
 		}
 		temp = 11;
-		//for(i = 0; i < 20; i++)printf("%d ", v2[i]);
-		//printf("\n");	
+			
 		//Copia valores impares maiores que 9
 		for(i = 0 ; i < aux; i++){
 			if((v1[i]%2 != 0 && v1[i] >= 10) && v1[i]==temp){
@@ -621,19 +699,12 @@ int *imprimeaux2(indvo *ppl, int * v, char turn){
 			for(; j < 20;j++)	
 				v2[j] = -1;
 		}
-		//puts("cvvvb");	
-		//for(i = 0; i < j;i++)
-		////	printf("%d ", v2[i]);
-	//	printf("\n");
-	//		for(i = 0; i < 20; i++)printf("%d ", v2[i]);
-	//printf("\n");
 		
 		
 	}
+	//caso o semestre for noturno
 	if(turn=='N'){
-		//puts("n4");printf("\n");
-		//for(k = 0; k < 10; k++)printf("%d ", v1[k]);
-		//printf("\n");
+		
 		j = 0;
 		temp = 20;
 		for(i = 0; i < aux; i++){
@@ -647,7 +718,7 @@ int *imprimeaux2(indvo *ppl, int * v, char turn){
 				j++;i--;temp+=2;			
 			
 			}
-		}//puts("n5");printf("j :%d %d", j,aux);puts("n6");
+		}
 		if(v1[i-1] < 28){
 			if(j == 0){
 				for(i = 0; i < 5;i++)
@@ -689,14 +760,11 @@ int *imprimeaux2(indvo *ppl, int * v, char turn){
 		if(j < 10)
 			for(;j < 10;j++)
 				v2[j] = -1;
-		//puts("noite");
-		//for(i = 0; i < 10; i++)printf("%d ",v2[i]);
-		//printf("\n");
+		
 	}
 	if(turn=='M')temp = 20;
 	else temp = 10;
-	//puts("ar\n");for(k = 0; k < temp;k++)
-	//printf("%d ",v2[k]);puts("puro");
+	
 	for(k = 0; k < temp; k++){
 		for(i = 0; i < aux;i++){
 			if(v2[k]==v1[i] && v2[k]!=-1){
@@ -706,15 +774,12 @@ int *imprimeaux2(indvo *ppl, int * v, char turn){
 		}				
 	}
 	
-	//puts("quas");
-	//for(k = 0; k < temp;k++)
-	//	printf("%d ",v2[k]);puts("see");
-		
 	return v2;
 		
 
 }
-int pertenceA(int *v,int test){
+
+/*int pertenceA(int *v,int test){
 	int i,j;
 	for(i = 0; i < aux;i++){
 		if(v[i] == test)return 1;
@@ -722,10 +787,23 @@ int pertenceA(int *v,int test){
 	return 0;
 
 
-}
+}*/
+
+
+/**
+ * @function imprime
+ *
+ * @param indvo *ppl - vetor de indivíduo
+ *
+ * A função é responsável por imprimir os horários dos semestres
+ * em forma de tabela. Para cada semestre, é imprimido os horários
+ * de forma separada.
+ *  
+ **/ 
+ 
 void imprime(indvo *ppl){
 	
-	int a = ppl->qtd;//puts(pop->individuos[0].genes_indv[a-1].sem);
+	int a = ppl->qtd;
 	int i,j,k;
 	int *v,*v2 ;
 	int ispar = 2;
@@ -737,6 +815,7 @@ void imprime(indvo *ppl){
 		printf("---------------------------------------------------------------------------|\n");
 	   printf("|-----|  Segunda     |  Terça     |  Quarta     |  Quinta     |  Sexta     |\n");
 	   printf("___________________________________________________________________________|\n");
+		//Seleciona os horarios do semestre v1		
 		if(strcmp(sm[i].se,"V1")==0){
 			
 	  		printf("13:30-|");
@@ -744,7 +823,7 @@ void imprime(indvo *ppl){
 			while(1){
 				if(ispar%2==0 && ppl->genes_indv[v[j]].dia_sem%2 == 0){
 					printf(" %s(%s)|", dsa[ppl->genes_indv[v[j]].disc].cod,ppl->genes_indv[v[j]].prof);
-					//printf("p:>%d ", ppl->genes_indv[v[j]].dia_sem);
+					
 					if(ppl->genes_indv[v[j]].dia_sem==18){
 						ispar = 1;j=0;
 						printf("\n");printf("15:20-|");					
@@ -754,7 +833,7 @@ void imprime(indvo *ppl){
 				}
 				else if(ispar%2!=0 && ppl->genes_indv[v[j]].dia_sem%2!=0){
 					printf("  %s(%s)|", dsa[ppl->genes_indv[v[j]].disc].cod,ppl->genes_indv[v[j]].prof);
-					//printf("t:>%d ", ppl->genes_indv[v[j]].dia_sem);
+					
 					if(ppl->genes_indv[v[j]].dia_sem==19){
 						ispar = 2;free(v);
 						printf("\n");					
@@ -769,60 +848,67 @@ void imprime(indvo *ppl){
 			
 			}
 		}
-	else if(sm[i].se[0]=='M'){
+		//Seleciona os horarios do matutino
+		else if(sm[i].se[0]=='M'){
 	//else if(strcmp(sm[i].se,"M3")==0)	{
-		v= imprimeaux(ppl,sm[i].se);//puts("oi");
-		v2 = imprimeaux2(ppl,v,sm[i].se[0]);//puts("pass");
-		//for(k = 0; k < 20; k++)printf("%d ", ppl->genes_indv[v2[k]].dia_sem);puts("op");
-		printf("07:30-|");
-		for(k = 0; k < 20; k ++){
-			if(v2[k]!= -1)
-				printf("%d %s(%s)|", ppl->genes_indv[v2[k]].dia_sem,dsa[ppl->genes_indv[v2[k]].disc].cod,ppl->genes_indv[v2[k]].prof);
-			else printf(" --------- |");	
-			if(k >= 4 && k<5){
-				printf("\n10:10-|");
+			v= imprimeaux(ppl,sm[i].se);
+			v2 = imprimeaux2(ppl,v,sm[i].se[0]);
+		
+			printf("07:30-|");
+			for(k = 0; k < 20; k ++){
+				if(v2[k]!= -1)
+					printf("%d %s(%s)|", ppl->genes_indv[v2[k]].dia_sem,dsa[ppl->genes_indv[v2[k]].disc].cod,ppl->genes_indv[v2[k]].prof);
+				else printf(" --------- |");	
+				if(k >= 4 && k<5){
+					printf("\n10:10-|");
 			
-			}
+				}
 					
-			else if(k >=9 && k < 10)
-				printf("\n13:30-|"); 
+				else if(k >=9 && k < 10)
+					printf("\n13:30-|"); 
 		
-			else if(k >=14 && k < 15)
-				printf("\n15:20-|");
+				else if(k >=14 && k < 15)
+					printf("\n15:20-|");
+			}
 		}
-	
-	//10-0, 12-1, 14-2, 16-3, 18-4
-	//1-5,3-6,5-7,7-8,9-9,10-10,
-	//12-11,14-12,16-13,18-14
-	
-	
-	}
-	else if(sm[i].se[0]=='N'){
-		//puts("n1");
-		v= imprimeaux(ppl,sm[i].se);//puts("n2");
-		//for(k = 0; k < aux; k++)printf("%d ", v[k]);puts("n00");
-		v2 = imprimeaux2(ppl,v,sm[i].se[0]);//puts("n3");
+		//seleciona os horarios do noturno
+		else if(sm[i].se[0]=='N'){
 		
-		printf("19:10-|");
-		for(k = 0; k < 10;k++){
-			if(v2[k]!=-1)		
-				printf("%d %s(%s)|", ppl->genes_indv[v2[k]].dia_sem,dsa[ppl->genes_indv[v2[k]].disc].cod,ppl->genes_indv[v2[k]].prof);
-			else printf(" -------- |");
-			if(k>=4 && k < 5)
-				printf("\n21:00-|");
+			v= imprimeaux(ppl,sm[i].se);
+		
+			v2 = imprimeaux2(ppl,v,sm[i].se[0]);
+		
+			printf("19:10-|");
+			for(k = 0; k < 10;k++){
+				if(v2[k]!=-1)		
+					printf("%d %s(%s)|", ppl->genes_indv[v2[k]].dia_sem,dsa[ppl->genes_indv[v2[k]].disc].cod,ppl->genes_indv[v2[k]].prof);
+				else printf(" -------- |");
+				if(k>=4 && k < 5)
+					printf("\n21:00-|");
 		
 		
-		}
+			}
 	
 	
-		printf("\n");
-	}		
+			printf("\n");
+		}		
 		
 		
 		
 	}
 
 }
+
+
+/**
+ * @function criaIndv
+ *
+ * @param indvo *ppl - Recebe vetor de indivíduo
+ *
+ * A função cria um vetor do tipo indivíduo e copia
+ * os dados do vetor ppl. 
+ * 
+ **/ 
 indvo *criaIndv(indvo *ppl){
 
 	indvo *nv;
@@ -832,7 +918,7 @@ indvo *criaIndv(indvo *ppl){
 	nv->qtdpr = ppl->qtdpr;
 	nv->choques = ppl->choques;
 	nv->genes_indv = (genes *)malloc(sizeof(genes)*150);
-	for(i = 0; i < ppl->qtd;i++){//puts("kkk");
+	for(i = 0; i < ppl->qtd;i++){
 		nv->genes_indv[i].dia_sem = ppl->genes_indv[i].dia_sem;
 		nv->genes_indv[i].prof = (char *)malloc(sizeof(char)*20);
 		strcpy(nv->genes_indv[i].prof,ppl->genes_indv[i].prof);
@@ -850,6 +936,26 @@ indvo *criaIndv(indvo *ppl){
 	}
 	return nv;
 }
+
+
+/**
+ * @function cruzamento
+ *
+ * @param indvo *ppl1- Recebe um vetor do tipo indivíduo
+ * @param indvo *ppl2 -Recebe outro vetor do tipo indivíduo
+ *
+ * A função faz o cruzamento de dois indivíduos. Essa operação 
+ * ocorre da seguinte forma:
+ * Primeiramente é selecionado algum dos dois indivíduos passados por
+ * parâmetro Assim, é selecionado algum (aleatório) dos genes do indivíduo que foi
+ * selecionado, então é escolhido um gene no outro indivíduo, este gene é
+ * colocado no horário do primeiro gene anteriormente selecionado. Para
+ * evitar duplicações de horários, o primeiro gene substituído é realocado
+ * em outra posição no vetor de genes.
+ * Para simplificar a implementação, o cruzamento ocorre com genes do
+ * mesmo semestre.
+ * 
+ **/ 
 indvo *cruzamento(indvo *ppl1, indvo *ppl2){
 
 	int outro,otr;
@@ -1255,26 +1361,31 @@ indvo *cruzamento(indvo *ppl1, indvo *ppl2){
 	//}
 	return novo;
 }
-//nao finalizado/
-int mutacao(indvo *ppl, char *arq){
+
+
+/**
+ * @function mutacao
+ * @param indvo *ppl - vetor do indivíduo
+ * 
+ * A função de mutação seleciona um gene no vetor de um indivíduo,
+ * então é selecionado um horário livre para trocar, ou seja, troca
+ * um horário preenchido por um livre. Sendo assim, a mutação ocorre
+ * em cima da troca de horário ( para facilitar a implementação, foi 
+ * utilizado a mutação apenas em semestres onde possui horários livres
+ * para suas respectivas salas).
+ * 
+ * 
+ **/ 
+int mutacao(indvo *ppl){
 
 	int r = rand() % ppl->qtd;
 	
 	int numsala;
 	
 	int distt,i,j,flag;
-
-	for(i = 0 ; i < ppl->qtd;i++)
-		if(strcmp(ppl->genes_indv[i].sem,"M3")==0){
-			r = i;break;
-		}
-	printf("MUt");
-	printf("%d %s ", ppl->genes_indv[r].dia_sem,
-	ppl->genes_indv[r].prof);
+	int x = 0;
 	
-	//free(auxsm)
-	sm = leSemestre(arq);
-	if(!sm) return ERRONALEITURA;
+	//if(!sm) return ERRONALEITURA;
 	auxsm = copiaEst(sm);
 	if(strcmp(ppl->genes_indv[r].sem,"V1")==0){
 			numsala = achaSala(ppl->genes_indv[r].sem);
@@ -1285,8 +1396,8 @@ int mutacao(indvo *ppl, char *arq){
 	else if(ppl->genes_indv[r].sem[0]=='N'){
 			numsala = achaSala(ppl->genes_indv[r].sem);	
 	}
-		//printf("N %d ", numsala);
-		//printf("%d %d %s\n", numsala,temp,dsa[j].cod_sem);
+		
+		
 		
 	for(i = 0 ; i < auxsm[numsala].num;i++){
 		for(j = 0; j < ppl->qtd;j++){
@@ -1294,12 +1405,14 @@ int mutacao(indvo *ppl, char *arq){
 				auxsm[numsala].horarios[i] = -1;
 		}
 	}
-	//puts(auxsm[numsala].se);
-	for(i = 0; i < auxsm[numsala].num;i++)
-	 printf("%d ", auxsm[numsala].horarios[i]);
-	//return 0;
-	printf("\n");
-	freeMem(sm,SEMESTRE);
+	int tee = 0;	
+	for(i = 0; i < auxsm[numsala].num;i++){
+		if(auxsm[numsala].horarios[i]!=-1)
+			tee = 1;		
+	}
+	if(tee == 0 ){
+		return ERROMUTACAO;
+	}
 	
 	if(ppl->genes_indv[r].dia_sem != auxsm[numsala].horarios[auxsm[numsala].num-1]){
 		for(i = 0; i < auxsm[numsala].num;i++){
@@ -1308,11 +1421,11 @@ int mutacao(indvo *ppl, char *arq){
 					distt = i;flag = 1;break;				
 				} 
 		}
-		printf("rTTT : %d ",distt);
+		
 		while(1){
 			flag = 1;
-			if(!testaRestricao(*ppl, dsa[ppl->genes_indv[r].disc], auxsm[numsala].horarios[distt])){printf("restricao");
-				printf("\n");
+			if(!testaRestricao(*ppl, dsa[ppl->genes_indv[r].disc], auxsm[numsala].horarios[distt])){
+				
 				for(i = distt; i < auxsm[numsala].num;i++){
 					if((auxsm[numsala].horarios[i]!= -1) && 
 					(auxsm[numsala].horarios[i]!= auxsm[numsala].horarios[distt])){
@@ -1326,22 +1439,23 @@ int mutacao(indvo *ppl, char *arq){
 			}
 			for(i = 0; i < ppl->qtd;i++){
 				if(ppl->genes_indv[i].dia_sem == auxsm[numsala].horarios[distt] &&
-				strcmp(ppl->genes_indv[i].sem,sm[ppl->genes_indv[i].sala_id].se)==0){printf("igual");
-					int dfi;				
+				strcmp(ppl->genes_indv[i].sem,sm[ppl->genes_indv[i].sala_id].se)==0){
+					int dfi;	
+							
 					for(dfi = distt; dfi < auxsm[numsala].num;dfi++){
 					//if((auxsm[numsala].horarios[dfi] != auxsm[numsala].horarios[distt]) &&
-						if(auxsm[numsala].horarios[dfi] >= 0){distt = dfi;flag=0;printf("pppp");break;}			
+						if(auxsm[numsala].horarios[dfi] >= 0){distt = dfi;flag=0;break;}			
 						}
 					if(i>=auxsm[numsala].horarios[auxsm[numsala].num])
 						return ERROMUTACAO;
 					//continue;
 				}
 			}
-			puts("laco");
+			
 			if(flag == 1)break;
+			x++;
+			if(x >= sm[numsala].num)return ERROMUTACAO;
 		}
-		//puts("passe");
-		//printf("novo > %d %d\n", ppl->genes_indv[r].dia_sem,auxsm[numsala].horarios[distt]);
 		ppl->genes_indv[r].dia_sem = auxsm[numsala].horarios[distt];
 		quicksort2(ppl->genes_indv,0,ppl->qtd-1);
 		avaliacao(ppl);
@@ -1353,6 +1467,21 @@ int mutacao(indvo *ppl, char *arq){
 
 }
 
+/**
+ * @function geraIndividuos
+ *
+ * @param indvo *ppl - Vetor do tipo indivíduo
+ * @param char *arq - Nome do arquivo 'curso.dat' para leitura
+ * 
+ * A função é responsável por gerar um indivíduo válido. Nesta
+ * rotina, para adicionar cada horário na grade, é verificado a
+ * condição de restrição, e também não permite incluir horários
+ * cuja os professores e disciplinas estejam no mesmo período. A ordem
+ * de seleção das disciplinas é feita de forma aleatória, assim como os 
+ * horários referentes a cada semestre em suas respectivas salas. Por último,
+ * é acrescentado uma avaliação inicial para o indivíduo gerado(i.e. fitness).
+ * 
+ **/ 
 
 int geraIndividuos(indvo *ppl, char *arq){
 
@@ -1365,11 +1494,10 @@ int geraIndividuos(indvo *ppl, char *arq){
 	ppl->qtd =0;
 	ppl->genes_indv = (genes *)malloc(sizeof(genes)*150);
 	if(!ppl->genes_indv)return ERROALOCACAO;
-	//ppl->qtd- = (genes *)malloc(sizeof(genes)*150);
 	
 	
-//<<<<<<< HEAD
-	//pf = leProfessores(arq);
+	
+	//Lê apenas uma vez, porque estas structs são usadas em outras funções depois.
 	if(primeiro){
 		pf = leProfessores(arq);	
 		sm = leSemestre(arq);
@@ -1377,9 +1505,7 @@ int geraIndividuos(indvo *ppl, char *arq){
 		primeiro = 0;
 	}
 	
-	//sm = leSemestre(arq);
-//=======
-	//pf = leProfessores(arq);
+
 	if(!pf){freeMem(ppl,INDVO); return ERROALOCACAO;}
 	//sm = leSemestre(arq);
 	if(!sm){freeMem(ppl,INDVO); freeMem(pf,PROF_AUX); return ERROALOCACAO;}
@@ -1387,24 +1513,19 @@ int geraIndividuos(indvo *ppl, char *arq){
 	if(!dsa){freeMem(ppl,INDVO); freeMem(pf,PROF_AUX);  freeMem(sm,SEMESTRE); return ERROALOCACAO;}
 	auxsm = copiaEst(sm);
 	if(!auxsm){freeMem(ppl,INDVO); freeMem(pf,PROF_AUX);  freeMem(sm,SEMESTRE);  freeMem(dsa,DISC_AUX); return ERROALOCACAO;}
-//>>>>>>> 5356ad8432beea25ce2ac2c32cf74dc7fba82e77
+
 	
 	auxsm = copiaEst(sm);
 		
-///	puts("aloc");
-//	printf("primeir");
-	//for(i = 0; i < auxsm[5].num;i++)
-	//printf("%d ", auxsm[5].horarios[i]);
-	//			printf("\n");	
+	
 	int *v = (int *)malloc(sizeof(int)*qtddisc);
 	if(!v){freeMem(ppl,INDVO);freeMem(pf,PROF_AUX);freeMem(sm,SEMESTRE);freeMem(dsa,DISC_AUX);freeMem(auxsm,SEMESTRE); return ERROALOCACAO;}
-	int *salasd = (int *)malloc(sizeof(int)*30);
-	if(!salasd){ freeMem(ppl,INDVO);freeMem(pf,PROF_AUX);freeMem(sm,SEMESTRE);freeMem(dsa,DISC_AUX);freeMem(auxsm,SEMESTRE); free(v); return ERROALOCACAO;}
+	
 	for(i =0 ; i < qtddisc;i++){
 		v[i] = dsa[i].periodo; 
 	//	printf("%d ", v[i]);
 	} //return 0;
-	for(i = 0; i < 30;i++) salasd[i] = i;
+
 	
 	discomp = testaParada(v);
 	srand(time(NULL));
@@ -1412,9 +1533,9 @@ int geraIndividuos(indvo *ppl, char *arq){
 	
 	while(discomp){
 		//Escolhe disciplina aleatoria
-	//	flag = 0;
-		//printf("%d",x);		
-		//puts("while");
+	
+		//caso execução ultrapasse 70 passos, a geração é abortada,
+		//pois o mesmo é inválido.
 		if(x > 70){
 			return ERROINDIVIDUO;				
 		
@@ -1422,13 +1543,8 @@ int geraIndividuos(indvo *ppl, char *arq){
 		int ll;		
 		//srand(0);
 		j = rand() %qtddisc;
-		//if(x > 37){
-			//for(ll = 0; ll < qtddisc;ll++)
-			//printf("%d ", v[ll]);printf("\n");
-		//	printf("j:%d\n", j);
-		//	return;
-		//printf("\n");
-	//}
+		
+	
 		if(v[j] < 1){
 			for(i = 0; i < qtddisc;i++)		
 				if(v[i] >0){ j = i;}
@@ -1446,46 +1562,19 @@ int geraIndividuos(indvo *ppl, char *arq){
 			//temp = 20 + rand() % 10;turno = 2;
 			numsala = achaSala(dsa[j].cod_sem);	
 		}
-		//printf("N %d ", numsala);
-		//printf("%d %d %s\n", numsala,temp,dsa[j].cod_sem);
+		
 		
 		distt = geraSala(auxsm,numsala);
-		//printf("dist>%d %d", auxsm[numsala].horarios[distt],numsala);
+		
 		
 		int l;		
-		//for(l = 0 ; l < auxsm[numsala].num;l++)
-		//	printf("%d ", auxsm[numsala].horarios[l]);
-		//if(ppl->individuos[0].genes_indv[j].prof)
+		
 		if(distt < 0)flag = 1;
-		//printf("ppl>%d, dsa %d hor: %d", ppl->genes_indv[0].dia_sem, dsa[j].periodo, auxsm[numsala].horarios[distt]);
-		//testaRestricao(*ppl, dsa[j], auxsm[numsala].horarios[distt]);
-		//puts("oi");		
-	//	return 90;
+	
 		if(!testaRestricao(*ppl, dsa[j], auxsm[numsala].horarios[distt])){
 			
 				int dfi;
-				//puts("okkoujnn");
-			//puts("rest");if(numsala==5){
-			//	printf("val:%d", auxsm[numsala].horarios[distt]);
-			//	printf("AREAAA");
-			//	for(i = 0; i < auxsm[5].num;i++)
-			//		printf("%d ", auxsm[5].horarios[i]);
-			//	printf("\n");			
-			//	}
-			/*if(auxsm[numsala].horarios[distt] == auxsm[numsala].horarios[auxsm[numsala].num-1]){
-				printf("simsims");
-				int al = rand() % auxsm[numsala].num-1;
-				for(i = 0; i < ppl->individuos[0].qtd;i++)
-					if(ppl->individuos[0].genes_indv[i].dia_sem == sm[numsala].horarios[al])
-						if(testaRestricao(ppl->individuos[0], dsa[j], sm[numsala].horarios[al])){
-							distt = al;
-							v[ppl->individuos[0].genes_indv[i].disc] = 1;							
-							break;							
-						}
-							//if(testaRestricao(ppl->individuos[0], dsa[j], auxsm[numsala].horarios[distt]))		
 			
-			
-			}*/
 			
 				for(dfi = 0; dfi < auxsm[numsala].num;dfi++)
 					if((auxsm[numsala].horarios[dfi] != auxsm[numsala].horarios[distt]) &&
@@ -1519,21 +1608,14 @@ int geraIndividuos(indvo *ppl, char *arq){
 		
 		}
 		if(!flag){
-			/*if(numsala == 5){
-				printf("AREAAA");
-				for(i = 0; i < auxsm[5].num;i++)
-					printf("%d ", auxsm[5].horarios[i]);
-				printf("\n");			
 			
-			
-			}*/
 			ppl->genes_indv[ppl->qtd].dia_sem = auxsm[numsala].horarios[distt];
 			ppl->genes_indv[ppl->qtd].prof = (char *)malloc(sizeof(char)*20);
 			if(!ppl->genes_indv[ppl->qtd].prof)return ERROALOCACAO;
 				
 			strcpy(ppl->genes_indv[ppl->qtd].prof,dsa[j].nome);
 						
-			test = achaProf(pf,dsa[j].nome);//printf("%d", pf[test].horarios[2]); 			
+			test = achaProf(pf,dsa[j].nome);			
 			ppl->genes_indv[ppl->qtd].notpref = 
 					copiaVetor(ppl->genes_indv[ppl->qtd].notpref,
 					pf[test].horarios, pf[test].num);		
@@ -1545,8 +1627,7 @@ int geraIndividuos(indvo *ppl, char *arq){
 			ppl->genes_indv[ppl->qtd].periodo = dsa[j].periodo; 			
 					
 			strcpy(ppl->genes_indv[ppl->qtd].sem,dsa[j].cod_sem);		
-			//auxsm[numsala].horarios[distt] = -1;			
-			//printf("%d",dsa[j].periodo);
+			
 			
 			if(v[j] == 1){
 				v[j] = -1;			
@@ -1571,20 +1652,11 @@ int geraIndividuos(indvo *ppl, char *arq){
 				}
 			}
 			auxsm[numsala].horarios[distt] = -1;
-			/*printf("%d %d %s %d %d %d \n",ppl->individuos[0].qtd,
-			ppl->individuos[0].genes_indv[ppl->individuos[0].qtd].dia_sem,
-			ppl->individuos[0].genes_indv[ppl->individuos[0].qtd].prof,
-			ppl->individuos[0].genes_indv[ppl->individuos[0].qtd].disc,
-			ppl->individuos[0].genes_indv[ppl->individuos[0].qtd].sala,
-			ppl->individuos[0].genes_indv[ppl->individuos[0].qtd].sala_id);
-				
-			*/
-			//int ll;
+			
 			ppl->qtd++;
 			discomp = testaParada(v);
 			
-			//printf("disc>%d ", discomp);		
-			//discomp--;		
+					
 		}
 		else flag = 0;
 		
@@ -1593,46 +1665,24 @@ int geraIndividuos(indvo *ppl, char *arq){
 		x++;
 		
 	}
-	//puts(ppl->individuos[0].genes_indv[ppl->individuos[0].qtd-1].sem);
-	//imprime(ppl);
-	int b;
-	//printf("XXXX %d", x);
+	
 	quicksort2(ppl->genes_indv,0,ppl->qtd-1);
-	
-	//printf("Fim");
-	//for(i = 0; i < ppl->qtd;i++){
-	//	if(ppl->genes_indv[i].sala_id == 5){
-	//		printf("%d ", ppl->genes_indv[i].dia_sem);
-	//	}	
-	//}printf("\n");
-	
-	//imprime(&ppl,dsa);
 	avaliacao(ppl);
-	//imprime(ppl);
-	/*free(v);
-	free(salasd);
-	freeMem(auxsm,SEMESTRE);
-	freeMem(sm,SEMESTRE);
-	freeMem(dsa,DISC_AUX);
-	freeMem(pf,PROF_AUX);
-//<<<<<<< HEAD
-	freeMem(ppl,PLCAO);
-	*/
-//=======
-	//freeMem(ppl,PLCAO);
 	
-//>>>>>>> 5356ad8432beea25ce2ac2c32cf74dc7fba82e77
-	//printf("Quebra: %d prf >: %d", ppl->individuos[0].choques, ppl->individuos[0].qtdpr);	
-	//puts("okeeee");	
-	//if(mutacao(&ppl->individuos[0])){
-	//	puts("h2w2e3");
-	//	imprime(&ppl->individuos[0],dsa);}
-	//else puts("naodeu");
-	//puts("herellll");
-	//	puts("ok");	
 	return OK;
 }
 
+/**
+ * @function eliminaPior
+ *
+ * @param plcao *pop - struct que contem toda a população
+ * @param indvo *ppl - novo individuo oriundo do cruzamento
+ *
+ * A função procura na população um individuo com a pior pontuação, isto é,
+ * com a maior soma de penalidades, assim posteriormente este individuo é 
+ *  sobrescrito com o novo vindo do cruzamento.
+ * 
+ **/ 
 int eliminaPior(plcao *pop, indvo *ppl){
 	int i,j,id=0;
 	int maior = 0;puts("te;;");
@@ -1664,6 +1714,16 @@ int eliminaPior(plcao *pop, indvo *ppl){
 	puts("tett");
 	return OK;
 }
+
+/**
+ * @function freeMem
+ *
+ * @param void *algo - Elemento esperado para liberação
+ * @param int component - Tipo do elemento a ser liberado
+ *
+ * Função auxiliar para liberação de memória 
+ * 
+ **/ 
 void freeMem(void *algo,int component){ /// Liberar memoria alocadas de cada estrutura separadamente
 	int i;
 	if(algo == NULL){
@@ -1732,6 +1792,7 @@ void freeMem(void *algo,int component){ /// Liberar memoria alocadas de cada est
 	}
 }
 
+//Função principal
 int main(int argc, char *argv[ ] ){
 	int i= 0;
 	int sp,pp;
@@ -1744,11 +1805,16 @@ int main(int argc, char *argv[ ] ){
 	populacao->individuos = (indvo *)malloc(sizeof(indvo)*TAM_POPULACAO);
 
 	
-	
+	int h;
 	sp = geraIndividuos(&populacao->individuos[0],argv[1]);
 	pp = geraIndividuos(&populacao->individuos[1],argv[1]);
-	
-	if(sp == OK && pp == OK)
+	if(sp == OK){
+		//imprime(&populacao->individuos[0]);	
+		for(h = 0; h < 1500;h++)		
+			mutacao(&populacao->individuos[0]);
+		imprime(&populacao->individuos[0]);	
+	}
+	/*if(sp == OK && pp == OK)
 		if(cruzamento(&populacao->individuos[0],&populacao->individuos[1])!=NULL)printf("cruzado");
 		else printf("nao");
 
@@ -1758,7 +1824,7 @@ int main(int argc, char *argv[ ] ){
 	puts("bn");
 	if(new){
 		if(eliminaPior(populacao,new)) freeMem(new,INDVO); 
-	}
+	}*/
 	//populacao = (plcao *)malloc(sizeof(plcao));
 	//populacao->individuos = (indvo *)malloc(sizeof(indvo));
 	//populacao->individuos->genes_indv = (genes *)malloc(sizeof(genes));

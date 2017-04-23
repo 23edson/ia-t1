@@ -1,8 +1,37 @@
+
+/**
+*   Universidade Federal da Fronteira Sul
+*
+*   TRABALHO I
+*   Disciplina: Inteligência Artificial
+*   Professor: José Carlos Bins Filho
+*
+*
+* 	 Alunos : Edson Lemes da Silva & Lucas Cezar Parnoff
+*   
+*   
+*  O trabalho consiste em aplicar o algoritmo genético para
+*  gerar a melhor grade de horários possível do Curso de Ciência
+*  da Computação, levando em conta as disciplinas do semestre vigente.
+*  A busca pelo melhor resultado refere-se na análise das preferências
+*  dos professores e na menor distribuição dos horários na grade escolar.
+*
+*
+**/
+
 #include "ag.h"
 
 
 //int qtdprof, qtddisc,qtdsem;
-
+/**
+ * @function auxF
+ *
+ * @param int v - vetor para verificação
+ * @param int tam - tamanho de v
+ * 
+ * Verifica se existe algum valor não nulo em v
+ *
+ **/ 
 int auxF(int *v, int tam){
 
 	int i;	
@@ -13,6 +42,17 @@ int auxF(int *v, int tam){
 	return flag;
 	
 }
+
+/**
+ * @function geraSequencia
+ *
+ * @param int v - vetor v que representa os horários de cada semestre
+ * @param tam - tamanho de v
+ * 
+ * A função pega os valores de v e sorteia uma ordem aleatória,
+ * porque posteriormente este vetor é lido em sequência. 
+ * 
+ **/ 
 int *geraSequencia(int *v, int tam){
 
 	int i,j;
@@ -21,14 +61,12 @@ int *geraSequencia(int *v, int tam){
 	int *m = (int *)malloc(sizeof(int)*tam);
 	int *v1 = (int *)malloc(sizeof(int)*tam);
 	j = 0;
-	//for(i = 0 ; i < tam;i++) printf("%d ", v[i]);
-//printf("\n");
+
 	for(i = 0 ; i < tam;i++) m[i] = 1;
-	//puts("t");
-	//printf("RRR> %d",);
+	
 	while(auxF(m,tam)){
 		
-		r= rand() %tam; //printf("rand %d\n", r);
+		r= rand() %tam; 
 		if(m[r] == -1){
 			for(i = 0; i < tam;i++){
 				if(m[i] != -1)	{	
@@ -41,12 +79,20 @@ int *geraSequencia(int *v, int tam){
 
 		m[r] = -1;
 		j++;	
-	}//puts("k");
-	//for(i = 0 ; i < tam;i++) printf("T.%d ", v1[i]);
-	//printf("\n");
+	}
 	free(m);free(v);
 	return v1;
 }
+
+/**
+ * @function leProfessores
+ *
+ * @param arq - Nome do arquivo
+ *
+ * Lê a primeira parte do arquivo que contém os professores, e
+ * armazena na estrutura global  prof_aux; 
+ * 
+ **/ 
 prof_aux *leProfessores(char arq[20]){
 	int qtd =0;
 	int ii,k,j,i;
@@ -62,13 +108,11 @@ prof_aux *leProfessores(char arq[20]){
 	fscanf (arqi, "%d", &qtdprof);
 	pf = (prof_aux *)malloc(sizeof(prof_aux)*qtdprof);
 	if(!t) {printf("Alocacao professores"); free(t); return NULL;}
-//printf("%d\n", qtdprof);
-	//printf("%d\n", i); 
-	//printf("%ld\n", ftell(arqi));
+
 	fseek(arqi,1,SEEK_CUR);
 	for(j = 0;j <qtdprof;j++){
 		fscanf(arqi,"%s %d", t, &ii);
-	//	printf("%s %d\n", t,ii);
+
 		pf[j].nome = (char *)malloc(sizeof(char)*strlen(t));
 		if(!pf[j].nome) {printf("Alocacao professores %d nome",j); freeMem(pf,PROF_AUX);return NULL;}
 		strcpy(pf[j].nome,t);
@@ -81,7 +125,7 @@ prof_aux *leProfessores(char arq[20]){
 		for(k =0;k<ii;k++){
 			fscanf (arqi, "%d", &qtd);
 			pf[j].horarios[k] = qtd;
-				//printf("%d ", pf[j].horarios[k]);
+				
 		}
 		
 	}
@@ -92,8 +136,17 @@ prof_aux *leProfessores(char arq[20]){
 	return pf;
 }
 
+/**
+ * @function leSemestre
+ *
+ * @param arq - Nome do arquivo
+ *
+ * Lê a segunda parte do arquivo que contém os semestres, e
+ * armazena na estrutura global  semestre *semn; 
+ * 
+ **/ 
 semestre *leSemestre(char arq[20]){
-
+	backup = posicao_arq;
 	FILE *arqi;
 	semestre *semn;
 	char *t = (char *)malloc(sizeof(char)*5);	
@@ -105,7 +158,7 @@ semestre *leSemestre(char arq[20]){
 	fscanf (arqi, "%d", &qtdsem);
 	semn = (semestre *)malloc(sizeof(semestre)*qtdsem);
 	if(!semn) {printf("Alocacao semestre"); free(t); return NULL;}
-	//printf("%d", qtdsem);
+	
 	for(i = 0;i<qtdsem;i++){
 		fscanf(arqi,"%s %d %d", t, &ii,&l);
 		strcpy(semn[i].se,t);
@@ -118,9 +171,7 @@ semestre *leSemestre(char arq[20]){
 			semn[i].horarios[j] = k;
 		}
 		semn[i].horarios= geraSequencia(semn[i].horarios,semn[i].num);
-		//for(j = 0; j < semn[i].num;j++)
-			//printf("%d ", semn[i].horarios[j]);
-		//printf("\n");
+		
 	}
 	
 	posicao_arq = ftell(arqi);
@@ -130,6 +181,15 @@ semestre *leSemestre(char arq[20]){
 	return semn;	
 }
 
+/**
+ * @function leDisciplina
+ *
+ * @param arq - Nome do arquivo
+ *
+ * Lê a última parte do arquivo que contém as disciplinas, e
+ * armazena na estrutura global  disc_aux *discc; 
+ * 
+ **/ 
 disc_aux *leDisciplina(char arq[20]){
 
 	FILE *arqi;
