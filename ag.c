@@ -1715,6 +1715,19 @@ int eliminaPior(plcao *pop, indvo *ppl){
 	return OK;
 }
 
+int achaMelhor(plcao *pop){
+	int i,j,id = 0;
+	int menor = 999;
+	for(i = 0; i < TAM_POPULACAO;i++){
+		if(pop->individuos[i].qtdpr + pop->individuos[i].choques < menor){
+			menor = pop->individuos[i].qtdpr + pop->individuos[i].choques;
+			id = i;
+		}
+	}
+	
+	return id;
+}
+
 /**
  * @function freeMem
  *
@@ -1794,7 +1807,7 @@ void freeMem(void *algo,int component){ /// Liberar memoria alocadas de cada est
 
 //Função principal
 int main(int argc, char *argv[ ] ){
-	int i= 0;
+	int i,j;
 	int sp,pp;
 	//printf("%s", argv[1]);
 	//char a = argv[0];
@@ -1802,37 +1815,54 @@ int main(int argc, char *argv[ ] ){
 	plcao *populacao;
 	indvo *new;
 	populacao = (plcao *)malloc(sizeof(plcao));
-	populacao->individuos = (indvo *)malloc(sizeof(indvo)*TAM_POPULACAO);
-
+	if(!populacao)return ERROALOCACAO;
 	
-	int h;
-	sp = geraIndividuos(&populacao->individuos[0],argv[1]);
-	pp = geraIndividuos(&populacao->individuos[1],argv[1]);
-	if(sp == OK){
-		//imprime(&populacao->individuos[0]);	
-		for(h = 0; h < 1500;h++)		
-			mutacao(&populacao->individuos[0]);
-		imprime(&populacao->individuos[0]);	
+	populacao->individuos = (indvo *)malloc(sizeof(indvo)*TAM_POPULACAO);
+	if(!populacao->individuos)return ERROALOCACAO;
+	
+	for(i = 0 ; i < TAM_POPULACAO;){
+		if(geraIndividuos(&populacao->individuos[i],argv[1])==OK)i++;
+	
 	}
+	srand(time(NULL));
+	for(i = 0 ; i < GERACOES;i++){
+		for(j = 0; j < TORNEIO;j++){
+			double prob = ((double) rand() / ((double)RAND_MAX+1));
+			if(prob < PROBCRUZAMENTO){
+				int ind1 = rand() % TAM_POPULACAO;
+				int ind2;
+				do{
+					ind2 = rand()% TAM_POPULACAO;				
+				}while(ind1==ind2);
+				new = cruzamento(&populacao->individuos[ind1],&populacao->individuos[ind2]);
+				//puts("ok");return 90;				
+				if(new!=NULL){
+					prob = ((double) rand() / ((double)RAND_MAX + 1));
+					if(prob < PROBMUTACAO){
+						mutacao(new);
+				
+					}
+					eliminaPior(populacao,new);					
+				}
+		
+			}
+		}
+	}
+	int id = achaMelhor(populacao);
+	imprime(&populacao->individuos[id]);
+	//int h;
+	//sp = geraIndividuos(&populacao->individuos[0],argv[1]);
+	//pp = geraIndividuos(&populacao->individuos[1],argv[1]);
+	//if(sp == OK){
+		//imprime(&populacao->individuos[0]);	
+	//	for(h = 0; h < 1500;h++)		
+	//		mutacao(&populacao->individuos[0]);
+	//	imprime(&populacao->individuos[0]);	
+	//}
 	/*if(sp == OK && pp == OK)
-		if(cruzamento(&populacao->individuos[0],&populacao->individuos[1])!=NULL)printf("cruzado");
+		icruzamento(&populacao->individuos[0],&populacao->individuos[1])!=NULL)printf("cruzado");
 		else printf("nao");
 
-	//geraIndividuos(&populacao->individuos[0],argv[1]);
-	//geraIndividuos(&populacao->individuos[1],argv[1]);
-	new = cruzamento(&populacao->individuos[0],&populacao->individuos[1]);
-	puts("bn");
-	if(new){
-		if(eliminaPior(populacao,new)) freeMem(new,INDVO); 
-	}*/
-	//populacao = (plcao *)malloc(sizeof(plcao));
-	//populacao->individuos = (indvo *)malloc(sizeof(indvo));
-	//populacao->individuos->genes_indv = (genes *)malloc(sizeof(genes));
-	//populacao->individuos->genes_indv->notpref = (int *)malloc(sizeof(int)*5);
-	//freeMem(populacao,PLCAO);
-	//geraIndividuos(populacao,argv[1]);
-	
-	//	populacao = (plcao *)malloc(sizeof(plcao));
-//	populacao->individuos = (indvo *)malloc(sizeof(indvo)*3);
+	*/
 	return 0;
 }
