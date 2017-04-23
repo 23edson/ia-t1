@@ -24,6 +24,9 @@
 #define UM_PONTO 1
 #define DOIS_PONTOS 2
 #define QUATRO_PONTOS 4
+//freeMem para os ponteiros globais do ag.c
+#define VARGLOBAIS 111
+
 
 int manha[10] = {0,1,2,3,4,5,6,7,8,9};
 int tarde[10] = {10,11,12,13,14,15,16,17,18,19};
@@ -1505,17 +1508,17 @@ int geraIndividuos(indvo *ppl, char *arq){
 	//Lê apenas uma vez, porque estas structs são usadas em outras funções depois.
 	if(primeiro){
 		pf = leProfessores(arq);	
+		if(!pf){freeMem(ppl,INDVO); return ERROALOCACAO;} // deve ficar junto, assim não sera usado se for invalido.
 		sm = leSemestre(arq);
+		if(!sm){freeMem(ppl,INDVO); freeMem(pf,PROF_AUX); return ERROALOCACAO;}
 		dsa = leDisciplina(arq);
+		if(!dsa){freeMem(ppl,INDVO); freeMem(pf,PROF_AUX);  freeMem(sm,SEMESTRE); return ERROALOCACAO;}
 		primeiro = 0;
 	}
 	
 
-	if(!pf){freeMem(ppl,INDVO); return ERROALOCACAO;}
 	//sm = leSemestre(arq);
-	if(!sm){freeMem(ppl,INDVO); freeMem(pf,PROF_AUX); return ERROALOCACAO;}
 	//dsa = leDisciplina(arq);//nao tem pra que retirar essa linha sendo que essa variavel, nao e global e esta sendo usada nos strcmp abaixo.
-	if(!dsa){freeMem(ppl,INDVO); freeMem(pf,PROF_AUX);  freeMem(sm,SEMESTRE); return ERROALOCACAO;}
 	auxsm = copiaEst(sm);
 	if(!auxsm){freeMem(ppl,INDVO); freeMem(pf,PROF_AUX);  freeMem(sm,SEMESTRE);  freeMem(dsa,DISC_AUX); return ERROALOCACAO;}
 
@@ -1525,7 +1528,7 @@ int geraIndividuos(indvo *ppl, char *arq){
 	
 	int *v = (int *)malloc(sizeof(int)*qtddisc);
 	if(!v){freeMem(ppl,INDVO);freeMem(pf,PROF_AUX);freeMem(sm,SEMESTRE);freeMem(dsa,DISC_AUX);freeMem(auxsm,SEMESTRE); return ERROALOCACAO;}
-	
+	//aqui ja começa a ficar grande as liberações
 	for(i =0 ; i < qtddisc;i++){
 		v[i] = dsa[i].periodo; 
 	//	printf("%d ", v[i]);
@@ -1768,6 +1771,26 @@ void freeMem(void *algo,int component){ /// Liberar memoria alocadas de cada est
 		return;
 	}
 	switch(component) {
+		case VARGLOBAIS :{   /// ponteiros globais "pf","sm","dsa","auxsm"
+			if(pf != NULL){
+				if(sm != NULL){
+					if(dsa != NULL){
+						if(auxsm != NULL){
+							freeMem(auxsm,SEMESTRE);
+						}
+						freeMem(dsa,DISC_AUX);
+					}
+					freeMem(sm,SEMESTRE);
+				}
+				freeMem(pf,PROF_AUX);
+			}
+			else if(auxsm != NULL){
+				freeMem(auxsm,SEMESTRE);
+			}
+			else
+				printf("ponteiros globais nao possuem memoria alocada\n");
+			break;
+		}
 		case DISC_AUX :{   /// "disc_aux"
 			disc_aux *a = (disc_aux *)algo;
 			for(i=0;i<qtddisc;i++)
@@ -1822,7 +1845,7 @@ void freeMem(void *algo,int component){ /// Liberar memoria alocadas de cada est
 			free(a);
 			break;
 		}
-		default:{
+		default:{ /// essa funcão não será usada para liberar variaveis normais que só necessitam de um unico "free('var')";
 			printf("Componente nao identificado");
 			break;
 		}
