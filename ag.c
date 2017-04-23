@@ -37,10 +37,10 @@ int aux;
 int par,impar;
 int contador = 0;
 //Variaveis comuns
-prof_aux *pf;
-semestre *sm;
-disc_aux *dsa;
-semestre *auxsm;
+prof_aux *pf    = NULL;
+semestre *sm    = NULL;
+disc_aux *dsa   = NULL;
+semestre *auxsm = NULL;
 
 /**
  * @function avaliacao
@@ -1501,7 +1501,7 @@ int geraIndividuos(indvo *ppl, char *arq){
 	ppl->choques = 0;
 	ppl->qtdpr = 0;
 	ppl->genes_indv = (genes *)malloc(sizeof(genes)*150);
-	if(!ppl->genes_indv)return ERROALOCACAO;
+	if(!ppl->genes_indv){ freeMem(auxsm,VARGLOBAIS); return ERROALOCACAO;}
 	
 	
 	
@@ -1510,9 +1510,9 @@ int geraIndividuos(indvo *ppl, char *arq){
 		pf = leProfessores(arq);	
 		if(!pf){freeMem(ppl,INDVO); return ERROALOCACAO;} // deve ficar junto, assim não sera usado se for invalido.
 		sm = leSemestre(arq);
-		if(!sm){freeMem(ppl,INDVO); freeMem(pf,PROF_AUX); return ERROALOCACAO;}
+		if(!sm){freeMem(ppl,INDVO); freeMem(pf,VARGLOBAIS); return ERROALOCACAO;}
 		dsa = leDisciplina(arq);
-		if(!dsa){freeMem(ppl,INDVO); freeMem(pf,PROF_AUX);  freeMem(sm,SEMESTRE); return ERROALOCACAO;}
+		if(!dsa){freeMem(ppl,INDVO); freeMem(sm,VARGLOBAIS); return ERROALOCACAO;}
 		primeiro = 0;
 	}
 	
@@ -1520,14 +1520,14 @@ int geraIndividuos(indvo *ppl, char *arq){
 	//sm = leSemestre(arq);
 	//dsa = leDisciplina(arq);//nao tem pra que retirar essa linha sendo que essa variavel, nao e global e esta sendo usada nos strcmp abaixo.
 	auxsm = copiaEst(sm);
-	if(!auxsm){freeMem(ppl,INDVO); freeMem(pf,PROF_AUX);  freeMem(sm,SEMESTRE);  freeMem(dsa,DISC_AUX); return ERROALOCACAO;}
+	if(!auxsm){freeMem(ppl,INDVO); freeMem(dsa,VARGLOBAIS); return ERROALOCACAO;}
 
 	
 	auxsm = copiaEst(sm);
 		
 	
 	int *v = (int *)malloc(sizeof(int)*qtddisc);
-	if(!v){freeMem(ppl,INDVO);freeMem(pf,PROF_AUX);freeMem(sm,SEMESTRE);freeMem(dsa,DISC_AUX);freeMem(auxsm,SEMESTRE); return ERROALOCACAO;}
+	if(!v){freeMem(ppl,INDVO); freeMem(auxsm,VARGLOBAIS); return ERROALOCACAO;}
 	//aqui ja começa a ficar grande as liberações
 	for(i =0 ; i < qtddisc;i++){
 		v[i] = dsa[i].periodo; 
@@ -1546,6 +1546,7 @@ int geraIndividuos(indvo *ppl, char *arq){
 		//caso execução ultrapasse 70 passos, a geração é abortada,
 		//pois o mesmo é inválido.
 		if(x > 70){
+			freeMem(ppl,INDVO);
 			return ERROINDIVIDUO;				
 		
 		}
@@ -1857,13 +1858,13 @@ int main(int argc, char *argv[ ] ){
 	int i,j;
 	int sp,pp;
 
-	plcao *populacao;
-	indvo *new;
-	populacao = (plcao *)malloc(sizeof(plcao));
+	plcao *populacao = NULL;
+	indvo *new       = NULL;
+	populacao        = (plcao *)malloc(sizeof(plcao));
 	if(!populacao)return ERROALOCACAO;
 	
 	populacao->individuos = (indvo *)malloc(sizeof(indvo)*TAM_POPULACAO);
-	if(!populacao->individuos)return ERROALOCACAO;
+	if(!populacao->individuos){ freeMem(populacao); return ERROALOCACAO; }
 	
 	for(i = 0 ; i < TAM_POPULACAO;){
 		if(geraIndividuos(&populacao->individuos[i],argv[1])==OK){i++;}
