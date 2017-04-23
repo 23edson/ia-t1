@@ -27,7 +27,12 @@
 #include <time.h>
 
 #define TAM_POPULACAO 10
+#define GERACOES 1
 
+#define PROBMUTACAO 0.2
+#define PROBCRUZAMENTO 0.7
+
+#define TORNEIO 20
 //Flags para controle de erros
 #define ERRONALEITURA 1
 #define ERROMUTACAO 3
