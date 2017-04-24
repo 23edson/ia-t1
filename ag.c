@@ -827,7 +827,7 @@ void imprime(indvo *ppl){
 	  		v= imprimeaux(ppl,"V1");
 			while(1){
 				if(ispar%2==0 && ppl->genes_indv[v[j]].dia_sem%2 == 0){
-					printf(" %s(%s)|", dsa[ppl->genes_indv[v[j]].disc].cod,ppl->genes_indv[v[j]].prof);
+					printf("%s(%s)|", dsa[ppl->genes_indv[v[j]].disc].cod,ppl->genes_indv[v[j]].prof);
 					
 					if(ppl->genes_indv[v[j]].dia_sem==18){
 						ispar = 1;j=0;
@@ -837,7 +837,7 @@ void imprime(indvo *ppl){
 				
 				}
 				else if(ispar%2!=0 && ppl->genes_indv[v[j]].dia_sem%2!=0){
-					printf("  %s(%s)|", dsa[ppl->genes_indv[v[j]].disc].cod,ppl->genes_indv[v[j]].prof);
+					printf("%s(%s)|", dsa[ppl->genes_indv[v[j]].disc].cod,ppl->genes_indv[v[j]].prof);
 					
 					if(ppl->genes_indv[v[j]].dia_sem==19){
 						ispar = 2;free(v);
@@ -875,6 +875,7 @@ void imprime(indvo *ppl){
 				else if(k >=14 && k < 15)
 					printf("\n15:20-|");
 			}
+			printf("\n");
 		}
 		//seleciona os horarios do noturno
 		else if(sm[i].se[0]=='N'){
@@ -1822,13 +1823,13 @@ int main(int argc, char *argv[ ] ){
 				
 				new = cruzamento(&populacao->individuos[ind1],&populacao->individuos[ind2]);
 							
-				if(new!=NULL){
-					imprime(new);		
+				if(new!=NULL){		
 					prob = ((double) rand() / ((double)RAND_MAX + 1));
 					if(prob < PROBMUTACAO){
 						mutacao(new);
 				
 					}
+					//elimina o pior individuo
 					eliminaPior(populacao,new);
 					//imprime(&populacao->individuos[getId]);			
 				}
@@ -1836,6 +1837,7 @@ int main(int argc, char *argv[ ] ){
 			}
 		}
 	}
+	//Procura individuo com melhor fitness
 	int id = achaMelhor(populacao);
 	imprime(&populacao->individuos[id]);
 	
