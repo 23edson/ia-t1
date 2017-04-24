@@ -2,10 +2,10 @@
 # 
 #                TRABALHO I
 #   
-#   Disciplina: Computação gráfica
+#   Disciplina: Inteligência Artificial
 #   Professor: José Carlos Bins Filho
 #    
-#   Renderização do Android andando de Skate 
+#   Aplicação do algoritmo genético para geração de horários. 
 # 	
 #
 #   Alunos : Edson Lemes da Silva && Lucas Cezar Parnoff
