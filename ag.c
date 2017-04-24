@@ -1542,7 +1542,7 @@ int geraIndividuos(indvo *ppl, char *arq){
 	if(!auxsm){freeMem(ppl,INDVO); freeMem(dsa,VARGLOBAIS); return ERROALOCACAO;}
 
 	
-	auxsm = copiaEst(sm);
+	//auxsm = copiaEst(sm);
 		
 	
 	int *v = (int *)malloc(sizeof(int)*qtddisc);
@@ -1790,6 +1790,7 @@ void freeMem(void *algo,int component){ /// Liberar memoria alocadas de cada est
 		printf("Nada para Limpar nesse %d.\n",component);
 		return;
 	}
+	printf("FREEMEM\n");
 	switch(component) {
 		case VARGLOBAIS :{   /// ponteiros globais "pf","sm","dsa","auxsm"
 			if(pf != NULL){
@@ -1813,17 +1814,21 @@ void freeMem(void *algo,int component){ /// Liberar memoria alocadas de cada est
 		}
 		case DISC_AUX :{   /// "disc_aux"
 			disc_aux *a = (disc_aux *)algo;
-			for(i=0;i<qtddisc;i++)
-				free(a[i].nome);
+			for(i=0;i<qtddisc;i++){
+				printf("i: %d disciplina\n",i);
+				if(a != NULL){
+					free(a[i].nome);}}
 			free(a);
 			a=NULL;
 			break;
 		}
 		case SEMESTRE:{   /// "semestre"
 			semestre *a = (semestre *)algo;
-			for(i=0;i<qtdsem;i++)
-				if(a[i].horarios!=NULL)
-					free(a[i].horarios);
+			for(i=0;i<qtdsem;i++){
+				printf("i: %d semestre\n",i);
+				if(a != NULL){
+					if(a[i].horarios!=NULL)
+						free(a[i].horarios);}}
 			free(a);
 			a=NULL;
 			break;
@@ -1831,11 +1836,12 @@ void freeMem(void *algo,int component){ /// Liberar memoria alocadas de cada est
 		case PROF_AUX:{   /// "prof_aux"
 			prof_aux *a = (prof_aux *)algo;
 			for(i=0;i<qtdprof;i++){
-				if(a[i].horarios!=NULL)
-				free(a[i].horarios);
-				if(a[i].nome!=NULL)
-				free(a[i].nome);
-			}
+				printf("i: %d prof\n",i);
+				if(a != NULL){
+					if(a[i].horarios!=NULL)
+						free(a[i].horarios);
+					if(a[i].nome!=NULL)
+						free(a[i].nome);}}
 			free(a);
 			a=NULL;
 			break;
@@ -1849,20 +1855,23 @@ void freeMem(void *algo,int component){ /// Liberar memoria alocadas de cada est
 		}	
 		case INDVO:{   /// "indvo"
 			indvo *a = (indvo *)algo;
-			for(i=0;i<TAM_POPULACAO;i++)
-				if(a[i].genes_indv != NULL)
-					freeMem(a[i].genes_indv,GENES);
+			for(i=0;i<TAM_POPULACAO;i++){
+				printf("i: %d indvo\n",i);
+				if(a != NULL){
+					if(a[i].genes_indv != NULL)
+						freeMem(a[i].genes_indv,GENES);}}
 			free(a);
 			break;
 		}
 		case GENES:{   /// "genes"
 			genes *a = (genes *)algo;
 			for(i=0;i<150;i++){
-				if(a[i].prof!=NULL)
-					free(a[i].prof);
-				if(a[i].notpref!=NULL)
-					free(a[i].notpref);
-			}
+				printf("i: %d genes\n",i);
+				if(a != NULL){
+					if(a[i].prof!=NULL)
+						free(a[i].prof);
+					if(a[i].notpref!=NULL)
+						free(a[i].notpref);}}
 			free(a);
 			break;
 		}
