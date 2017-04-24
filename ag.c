@@ -983,6 +983,9 @@ indvo *cruzamento(indvo *ppl1, indvo *ppl2){
 	indvo *novo;
 	genes *temp = (genes *)malloc(sizeof(genes)*150);
 	if(!temp)return NULL;
+	for(i=0;i<150;i++){
+		temp[i].prof    = NULL;
+		temp[i].notpref = NULL;}
 	
 	for(i=0;i<150;i++){
 		temp[i].prof    = NULL;
@@ -993,12 +996,19 @@ indvo *cruzamento(indvo *ppl1, indvo *ppl2){
 	int esc = rand()%2;
 	if(!esc){
 		novo = criaIndv(ppl1);
+<<<<<<< HEAD
 		if(!novo) freeMem(temp,GENES); return NULL;
 	}
 	else{ 
 		novo = criaIndv(ppl2);
 		if(!novo) freeMem(temp,GENES); return NULL;
 	}
+=======
+		if(!novo) freeMem(temp,GENES); return NULL;}
+	else{
+		if(!novo) freeMem(temp,GENES); return NULL;
+		novo = criaIndv(ppl2);}
+>>>>>>> 9440b11d1deac4529a631275f7069308fd8f39b3
 	
 	int dv = rand()%novo->qtd;
 	
@@ -1168,11 +1178,18 @@ indvo *cruzamento(indvo *ppl1, indvo *ppl2){
 	temp->dia_sem = novo->genes_indv[dv].dia_sem;
 	temp->prof = (char *)malloc(sizeof(char)*20);
 	if(!temp->prof){
+<<<<<<< HEAD
 		freeMem(temp,GENES); freeMem(novo,INDVO); return NULL;	
 	
 	}
 	temp->notpref = (int *)malloc(sizeof(int)*novo->genes_indv[dv].numpref);
 	if(!temp->notpref){freeMem(temp,GENES); freeMem(novo,INDVO); return NULL;}
+=======
+		puts("nnnnn"); freeMem(temp,GENES); freeMem(novo,INDVO); return NULL;}
+	temp->notpref = (int *)malloc(sizeof(int)*novo->genes_indv[dv].numpref);
+	 if(!temp->notpref){
+		puts("nnnnn"); freeMem(temp,GENES); freeMem(novo,INDVO); return NULL;}
+>>>>>>> 9440b11d1deac4529a631275f7069308fd8f39b3
 	
 	strcpy(temp->prof, novo->genes_indv[dv].prof);
 	for(i = 0;  i < novo->genes_indv[dv].numpref;i++)
@@ -1194,7 +1211,11 @@ indvo *cruzamento(indvo *ppl1, indvo *ppl2){
 			if(novo->genes_indv[k].dia_sem == ppl2->genes_indv[escolha].dia_sem &&		
 				novo->genes_indv[k].disc == ppl2->genes_indv[escolha].disc &&
 				strcmp(novo->genes_indv[k].prof,ppl2->genes_indv[escolha].prof)==0){
+<<<<<<< HEAD
 				freeMem(temp,GENES);freeMem(novo,INDVO);return NULL;}
+=======
+			freeMem(temp,GENES);freeMem(novo,INDVO);return NULL;}
+>>>>>>> 9440b11d1deac4529a631275f7069308fd8f39b3
 		
 		}
 		
@@ -1221,25 +1242,42 @@ indvo *cruzamento(indvo *ppl1, indvo *ppl2){
 		if(!testaRestricao(*novo, dsa[temp->disc], ppl2->genes_indv[escolha].dia_sem)){
 			freeMem(temp,GENES);freeMem(novo,INDVO);return NULL;		
 		
+<<<<<<< HEAD
 		}
 		//return NULL;
+=======
+		//		for(j = 0 ; j < novo->qtd;j++){
+		//	printf("%d %d %s %s", j,novo->genes_indv[j].dia_sem,
+		//	novo->genes_indv[j].prof,
+		//		novo->genes_indv[j].sem);printf("\n");}
+		if(!testaRestricao(*novo, dsa[temp->disc], ppl2->genes_indv[escolha].dia_sem)){
+		freeMem(temp,GENES);freeMem(novo,INDVO);return NULL;}
+>>>>>>> 9440b11d1deac4529a631275f7069308fd8f39b3
 	}
 	else{
 	
 		if(!testaRestricao(*novo, dsa[ppl1->genes_indv[escolha].disc], 
+<<<<<<< HEAD
 			novo->genes_indv[dv].dia_sem)){
 			freeMem(temp,GENES);freeMem(novo,INDVO);return NULL;		
 		}
+=======
+			novo->genes_indv[dv].dia_sem)){freeMem(temp,GENES);freeMem(novo,INDVO);return NULL;}
+>>>>>>> 9440b11d1deac4529a631275f7069308fd8f39b3
 		
 		for(ki = 0; k < novo->qtd;ki++){
 			if(novo->genes_indv[k].dia_sem == ppl1->genes_indv[escolha].dia_sem &&		
 				novo->genes_indv[k].disc == ppl1->genes_indv[escolha].disc &&
 				strcmp(novo->genes_indv[k].prof,ppl1->genes_indv[escolha].prof)==0){
+<<<<<<< HEAD
 				
 					freeMem(temp,GENES);freeMem(novo,INDVO);return NULL;				
 				
 				}
 			
+=======
+			freeMem(temp,GENES);freeMem(novo,INDVO);return NULL;}
+>>>>>>> 9440b11d1deac4529a631275f7069308fd8f39b3
 		
 		}
 		
@@ -1261,16 +1299,28 @@ indvo *cruzamento(indvo *ppl1, indvo *ppl2){
 		novo->genes_indv[dv].periodo =  ppl1->genes_indv[escolha].periodo;
 		strcpy(novo->genes_indv[dv].sem,ppl1->genes_indv[escolha].sem);
 		
+<<<<<<< HEAD
 		if(!testaRestricao(*novo, dsa[temp->disc], ppl1->genes_indv[escolha].dia_sem)){
 			freeMem(temp,GENES);freeMem(novo,INDVO);return NULL;
 		}
+=======
+
+																	
+		if(!testaRestricao(*novo, dsa[temp->disc], ppl1->genes_indv[escolha].dia_sem)){
+			freeMem(temp,GENES);freeMem(novo,INDVO);return NULL;}
+>>>>>>> 9440b11d1deac4529a631275f7069308fd8f39b3
 			
 		for(j = 0; j < novo->qtd;j++){
 			if(novo->genes_indv[j].dia_sem == novo->genes_indv[ki].dia_sem &&		
 				novo->genes_indv[j].disc == novo->genes_indv[ki].disc &&
 				strcmp(novo->genes_indv[j].prof,novo->genes_indv[ki].prof)==0){
+<<<<<<< HEAD
 				freeMem(temp,GENES);freeMem(novo,INDVO);return NULL;
 			}
+=======
+			freeMem(temp,GENES);freeMem(novo,INDVO);return NULL;}
+		
+>>>>>>> 9440b11d1deac4529a631275f7069308fd8f39b3
 		}		
 		
 	
@@ -1282,11 +1332,15 @@ indvo *cruzamento(indvo *ppl1, indvo *ppl2){
 		free(novo->genes_indv[ki].notpref);
 	novo->genes_indv[ki].notpref = NULL;
 	novo->genes_indv[ki].notpref = (int *)malloc(sizeof(int)*temp->numpref);//puts("inde7");
+<<<<<<< HEAD
 	if(!novo->genes_indv[ki].notpref){
 		freeMem(temp,GENES);freeMem(novo,INDVO);return NULL;	
 	
 	}	
 	
+=======
+	if(!novo->genes_indv[ki].notpref){freeMem(temp,GENES);freeMem(novo,INDVO);return NULL;}	
+>>>>>>> 9440b11d1deac4529a631275f7069308fd8f39b3
 	for(j = 0;  j < temp->numpref;j++)
 		novo->genes_indv[ki].notpref[j]=temp->notpref[j];
 	novo->genes_indv[ki].numpref= temp->numpref;
@@ -1707,7 +1761,11 @@ void freeMem(void *algo,int component){ /// Liberar memoria alocadas de cada est
 		printf("Nada para Limpar nesse %d.\n",component);
 		return;
 	}
+<<<<<<< HEAD
 	//printf("FREEMEM\n");
+=======
+	printf("FREEMEM\n");
+>>>>>>> 9440b11d1deac4529a631275f7069308fd8f39b3
 	switch(component) {
 		case VARGLOBAIS :{   /// ponteiros globais "pf","sm","dsa","auxsm"
 			if(pf != NULL){
@@ -1732,7 +1790,11 @@ void freeMem(void *algo,int component){ /// Liberar memoria alocadas de cada est
 		case DISC_AUX :{   /// "disc_aux"
 			disc_aux *a = (disc_aux *)algo;
 			for(i=0;i<qtddisc;i++){
+<<<<<<< HEAD
 		//		printf("i: %d disciplina\n",i);
+=======
+				printf("i: %d disciplina\n",i);
+>>>>>>> 9440b11d1deac4529a631275f7069308fd8f39b3
 				if(a != NULL){
 					free(a[i].nome);}}
 			free(a);
@@ -1742,7 +1804,11 @@ void freeMem(void *algo,int component){ /// Liberar memoria alocadas de cada est
 		case SEMESTRE:{   /// "semestre"
 			semestre *a = (semestre *)algo;
 			for(i=0;i<qtdsem;i++){
+<<<<<<< HEAD
 			//	printf("i: %d semestre\n",i);
+=======
+				printf("i: %d semestre\n",i);
+>>>>>>> 9440b11d1deac4529a631275f7069308fd8f39b3
 				if(a != NULL){
 					if(a[i].horarios!=NULL)
 						free(a[i].horarios);}}
@@ -1753,7 +1819,11 @@ void freeMem(void *algo,int component){ /// Liberar memoria alocadas de cada est
 		case PROF_AUX:{   /// "prof_aux"
 			prof_aux *a = (prof_aux *)algo;
 			for(i=0;i<qtdprof;i++){
+<<<<<<< HEAD
 			//	printf("i: %d prof\n",i);
+=======
+				printf("i: %d prof\n",i);
+>>>>>>> 9440b11d1deac4529a631275f7069308fd8f39b3
 				if(a != NULL){
 					if(a[i].horarios!=NULL)
 						free(a[i].horarios);
@@ -1773,7 +1843,11 @@ void freeMem(void *algo,int component){ /// Liberar memoria alocadas de cada est
 		case INDVO:{   /// "indvo"
 			indvo *a = (indvo *)algo;
 			for(i=0;i<TAM_POPULACAO;i++){
+<<<<<<< HEAD
 				//printf("i: %d indvo\n",i);
+=======
+				printf("i: %d indvo\n",i);
+>>>>>>> 9440b11d1deac4529a631275f7069308fd8f39b3
 				if(a != NULL){
 					if(a[i].genes_indv != NULL)
 						freeMem(a[i].genes_indv,GENES);}}
@@ -1783,7 +1857,11 @@ void freeMem(void *algo,int component){ /// Liberar memoria alocadas de cada est
 		case GENES:{   /// "genes"
 			genes *a = (genes *)algo;
 			for(i=0;i<150;i++){
+<<<<<<< HEAD
 			//	printf("i: %d genes\n",i);
+=======
+				printf("i: %d genes\n",i);
+>>>>>>> 9440b11d1deac4529a631275f7069308fd8f39b3
 				if(a != NULL){
 					if(a[i].prof!=NULL)
 						free(a[i].prof);
@@ -1851,11 +1929,15 @@ int main(int argc, char *argv[ ] ){
 	}
 	int id = achaMelhor(populacao);
 	imprime(&populacao->individuos[id]);
+<<<<<<< HEAD
 	
 	
 	free(populacao->individuos);
 //puts("avvvvq");	
 free(populacao);
 	//freeMem(populacao,PLCAO);
+=======
+	freeMem(populacao,PLCAO);
+>>>>>>> 9440b11d1deac4529a631275f7069308fd8f39b3
 	return 0;
 }
