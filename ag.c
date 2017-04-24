@@ -809,7 +809,7 @@ void imprime(indvo *ppl){
 	
 	int a = ppl->qtd;
 	int i,j,k;
-	int *v,*v2 ;
+	int *v = NULL,*v2 = NULL ;
 	int ispar = 2;
 	
 	int flag =0;
@@ -915,25 +915,37 @@ void imprime(indvo *ppl){
  **/ 
 indvo *criaIndv(indvo *ppl){
 
-	indvo *nv;
+	indvo *nv      = NULL;
 	int i,j;
-	nv = (indvo *)malloc(sizeof(indvo));
-	nv->qtd = ppl->qtd;
-	nv->qtdpr = ppl->qtdpr;
-	nv->choques = ppl->choques;
+	nv             = (indvo *)malloc(sizeof(indvo));
+	if(!nv)   
+		return NULL;// verificacao
+	nv->genes_indv = NULL;
+	nv->qtd        = ppl->qtd;
+	nv->qtdpr      = ppl->qtdpr;
+	nv->choques    = ppl->choques;
 	nv->genes_indv = (genes *)malloc(sizeof(genes)*150);
+	if(!nv->genes_indv){ 
+		freeMem(nv,INDVO); return NULL;}
 	for(i = 0; i < ppl->qtd;i++){
 		nv->genes_indv[i].dia_sem = ppl->genes_indv[i].dia_sem;
-		nv->genes_indv[i].prof = (char *)malloc(sizeof(char)*20);
+		nv->genes_indv[i].prof    = NULL;
+		nv->genes_indv[i].prof    = (char *)malloc(sizeof(char)*20);
+		if(!nv->genes_indv[i].prof){
+			freeMem(nv,INDVO); return NULL;}
 		strcpy(nv->genes_indv[i].prof,ppl->genes_indv[i].prof);
+		nv->genes_indv[i].notpref = NULL;
 		nv->genes_indv[i].notpref = (int *)malloc(sizeof(int)*ppl->genes_indv[i].numpref);
+		if(!nv->genes_indv[i].notpref){
+			freeMem(nv,INDVO); return NULL;}
+		
 		for(j = 0; j < ppl->genes_indv[i].numpref;j++){
 			nv->genes_indv[i].notpref[j] = ppl->genes_indv[i].notpref[j]; 		
 		
 		}
 		nv->genes_indv[i].numpref = ppl->genes_indv[i].numpref;
-		nv->genes_indv[i].disc = ppl->genes_indv[i].disc;
-		nv->genes_indv[i].sala = ppl->genes_indv[i].sala;
+		nv->genes_indv[i].disc    = ppl->genes_indv[i].disc;
+		nv->genes_indv[i].sala    = ppl->genes_indv[i].sala;
 		nv->genes_indv[i].sala_id = ppl->genes_indv[i].sala_id;
 		nv->genes_indv[i].periodo = ppl->genes_indv[i].periodo;
 		strcpy(nv->genes_indv[i].sem, ppl->genes_indv[i].sem);
@@ -961,11 +973,12 @@ indvo *criaIndv(indvo *ppl){
  * 
  **/ 
 indvo *cruzamento(indvo *ppl1, indvo *ppl2){
-
+	if(!ppl1) return NULL;
+	if(!ppl2) return NULL;
 	int outro,otr;
 	int escolha;
 	int i,j,ki,k,out = 0;
-	indvo *novo;
+	indvo *novo = NULL;
 	genes *temp = (genes *)malloc(sizeof(genes)*150);
 	if(!temp)return NULL;
 	
@@ -1334,7 +1347,8 @@ indvo *cruzamento(indvo *ppl1, indvo *ppl2){
 	//free(novo->genes_indv[ki].prof);
 	//novo->genes_indv[ki].prof = (char *)malloc(sizeof(char)*20);
 	strcpy(novo->genes_indv[ki].prof,temp->prof);//puts(temp->prof);
-	free(novo->genes_indv[ki].notpref);//puts("inde6");
+	if(novo->genes_indv[ki].notpref != NULL)
+		free(novo->genes_indv[ki].notpref);//puts("inde6");
 	novo->genes_indv[ki].notpref = NULL;
 	novo->genes_indv[ki].notpref = (int *)malloc(sizeof(int)*temp->numpref);//puts("inde7");
 	for(j = 0;  j < temp->numpref;j++)
