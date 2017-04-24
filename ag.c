@@ -1502,7 +1502,7 @@ int geraIndividuos(indvo *ppl, char *arq){
 	ppl->qtdpr = 0;
 	ppl->genes_indv = (genes *)malloc(sizeof(genes)*150);
 	if(!ppl->genes_indv){ freeMem(auxsm,VARGLOBAIS); return ERROALOCACAO;}
-	for(i=0;i<150;i++){ppl.prof = NULL; ppl.notpref = NULL;}
+	for(i=0;i<150;i++){ppl->genes_indv[i].prof = NULL; ppl->genes_indv[i].notpref = NULL;}
 	
 	
 	//Lê apenas uma vez, porque estas structs são usadas em outras funções depois.
@@ -1869,6 +1869,7 @@ int main(int argc, char *argv[ ] ){
 	if(!populacao->individuos){ freeMem(populacao,PLCAO); return ERROALOCACAO; }
 	
 	for(i = 0 ; i < TAM_POPULACAO;){
+		populacao->individuos[i].genes_indv = NULL;
 		if(geraIndividuos(&populacao->individuos[i],argv[1])==OK){i++;}
 	
 		
