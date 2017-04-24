@@ -1502,7 +1502,7 @@ int geraIndividuos(indvo *ppl, char *arq){
 	ppl->qtdpr = 0;
 	ppl->genes_indv = (genes *)malloc(sizeof(genes)*150);
 	if(!ppl->genes_indv){ freeMem(auxsm,VARGLOBAIS); return ERROALOCACAO;}
-	
+	for(i=0;i<150;i++){ppl.prof = NULL; ppl.notpref = NULL;}
 	
 	
 	//Lê apenas uma vez, porque estas structs são usadas em outras funções depois.
@@ -1831,7 +1831,8 @@ void freeMem(void *algo,int component){ /// Liberar memoria alocadas de cada est
 		case INDVO:{   /// "indvo"
 			indvo *a = (indvo *)algo;
 			for(i=0;i<TAM_POPULACAO;i++)
-				freeMem(a[i].genes_indv,GENES);
+				if(a[i].genes_indv != NULL)
+					freeMem(a[i].genes_indv,GENES);
 			free(a);
 			break;
 		}
@@ -1863,8 +1864,9 @@ int main(int argc, char *argv[ ] ){
 	populacao        = (plcao *)malloc(sizeof(plcao));
 	if(!populacao)return ERROALOCACAO;
 	
+	populacao->individuos = NULL;
 	populacao->individuos = (indvo *)malloc(sizeof(indvo)*TAM_POPULACAO);
-	if(!populacao->individuos){ freeMem(populacao); return ERROALOCACAO; }
+	if(!populacao->individuos){ freeMem(populacao,PLCAO); return ERROALOCACAO; }
 	
 	for(i = 0 ; i < TAM_POPULACAO;){
 		if(geraIndividuos(&populacao->individuos[i],argv[1])==OK){i++;}

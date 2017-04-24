@@ -111,6 +111,8 @@ prof_aux *leProfessores(char arq[20]){
 
 	fseek(arqi,1,SEEK_CUR);
 	for(j = 0;j <qtdprof;j++){
+		pf[j].nome     = NULL;
+		pf[j].horarios = NULL;
 		fscanf(arqi,"%s %d", t, &ii);
 
 		pf[j].nome = (char *)malloc(sizeof(char)*strlen(t));
@@ -160,6 +162,7 @@ semestre *leSemestre(char arq[20]){
 	if(!semn) {printf("Alocacao semestre"); free(t); return NULL;}
 	
 	for(i = 0;i<qtdsem;i++){
+		semn[i].horarios = NULL;
 		fscanf(arqi,"%s %d %d", t, &ii,&l);
 		strcpy(semn[i].se,t);
 		semn[i].sala = ii;
@@ -209,9 +212,9 @@ disc_aux *leDisciplina(char arq[20]){
 	fscanf (arqi, "%d", &qtddisc);
 	discc = (disc_aux *)malloc(sizeof(disc_aux)*qtddisc);
 	if(!discc) {printf("Alocacao disciplina"); free(t); free(t2); free(t1); return NULL;}
-	
 
 	for(i = 0; i < qtddisc;i++){
+		discc[i].nome = NULL;
 		fscanf(arqi,"%s %d %s %s", t, &j,t2,t1);
 		strcpy(discc[i].cod,t);
 		discc[i].periodo = j;
