@@ -368,15 +368,19 @@ int achaProf(prof_aux *pf, char *nome){
  **/
 
 semestre *copiaEst(semestre *ss){
-
-	semestre *aux;
+	if(!ss) return NULL;
+	semestre *aux = NULL;
 	int i,j;
 	aux = (semestre *)malloc(sizeof(semestre)*qtdsem);
+	if(!aux) return NULL;
 	for(i = 0 ; i < qtdsem;i++){
 		strcpy(aux[i].se,ss[i].se);
 		aux[i].num = ss[i].num;
 		aux[i].sala = ss[i].sala;
+		aux[i].horarios = NULL;
 		aux[i].horarios = (int *)malloc(sizeof(int)*aux[i].num);
+		if(!aux[i].horarios){
+			freeMem(aux,SEMESTRE); return NULL;}
 		for( j = 0; j < aux[i].num;j++)
 			aux[i].horarios[j] = ss[i].horarios[j];
 	}	
@@ -806,7 +810,7 @@ int *imprimeaux2(indvo *ppl, int * v, char turn){
  **/ 
  
 void imprime(indvo *ppl){
-	
+	if(!ppl){ printf("individuo NULL:void imprime"); return;}
 	int a = ppl->qtd;
 	int i,j,k;
 	int *v = NULL,*v2 = NULL ;
@@ -1397,7 +1401,7 @@ indvo *cruzamento(indvo *ppl1, indvo *ppl2){
  * 
  **/ 
 int mutacao(indvo *ppl){
-
+	if(!ppl) return ERROINDIVIDUO;
 	int r = rand() % ppl->qtd;
 	
 	int numsala;
@@ -1407,6 +1411,7 @@ int mutacao(indvo *ppl){
 	
 	//if(!sm) return ERRONALEITURA;
 	auxsm = copiaEst(sm);
+	if(!auxsm) return ERROALOCACAO;
 	if(strcmp(ppl->genes_indv[r].sem,"V1")==0){
 			numsala = achaSala(ppl->genes_indv[r].sem);
 	}
