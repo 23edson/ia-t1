@@ -2,22 +2,18 @@
 # 
 #                TRABALHO I
 #   
-#   Disciplina: Inteligência Artificial
+#   Disciplina: Computação gráfica
 #   Professor: José Carlos Bins Filho
 #    
-#   Aplicação do algoritmo genético para geração de horários.
+#   Renderização do Android andando de Skate 
 # 	
 #
-#   Aluno : Edson Lemes da Silva && Lucas Cezar Parnoff
+#   Alunos : Edson Lemes da Silva && Lucas Cezar Parnoff
 #
 #
 #  --- MAKEFILE DE COMPILAÇÃO E EXECUÇAO ---
-all: ag
 
-ag: *.c
-	gcc ag.c ag.h readFile.c -o  main
-	./main curso.dat
+all: prog
 
-
-clean:
-	rm main   
+prog: ag.c ag.h readFile.c
+	gcc ag.c ag.h readFile.c -o  main && ./main curso.dat
