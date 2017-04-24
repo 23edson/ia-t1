@@ -12,6 +12,7 @@
 
 
 **Compilação**
+
 Para compilar é necessário digitar na linha de comando "make".
 
 Compilado e executado no LINUX.

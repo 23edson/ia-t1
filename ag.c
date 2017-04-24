@@ -64,8 +64,9 @@ semestre *auxsm;
 
 int  avaliacao(indvo *ppl){
 
-	int i,j,tam,tam2,k;
-	int aparece = 0,flag = 0;
+	int i,j,tam,k;
+	int aparece = 0;
+	int flag = 0;
 	int soma = 0;
 	int *hora = (int *)malloc(sizeof(int)*5);
 	int *hora2 = (int *)malloc(sizeof(int)*5);
@@ -97,7 +98,7 @@ int  avaliacao(indvo *ppl){
 	
 	//Penaliza horarios consecutivos
 	for(i = 0 ; i < qtddisc;i++){
-		tam  = 0;flag = 0;aparece = 0;tam2 = 0;
+		tam  = 0;flag = 0;aparece = 0;
 		strcpy(nome,dsa[i].nome);
 		for(j = 0; j < ppl->qtd;j++){
 			if(ppl->genes_indv[j].disc == i && ppl->genes_indv[j].periodo == 2 &&
@@ -148,7 +149,7 @@ int  avaliacao(indvo *ppl){
 	ppl->qtdpr += soma;
 	
 	soma = 0;
-	int dia;
+	
 	//Verifica horario de manha e noite no mesmo dia
 	//(00,01)->(20,21), (02,03)->(22,23)
 	//(04,05)->(24,25), (06,07)->(26,27)
@@ -397,7 +398,6 @@ semestre *copiaEst(semestre *ss){
 int geraSala(semestre *aux, int n){
 
 	int i;
-	int g;
 	
 	for(i = 0; i < aux[n].num;i++)
 		if(aux[n].horarios[i] >= 0) return i;	
@@ -445,7 +445,7 @@ int testaParada(int *v){
  **/
 void quicksort2(genes *vetor, int inicio, int fim){
    
-   int pivo, aux, i, j, meio,k;
+   int pivo, i, j, meio,k;
    genes *v1 = (genes *)malloc(sizeof(genes));
    i = inicio;
    j = fim;
@@ -515,7 +515,7 @@ void quicksort2(genes *vetor, int inicio, int fim){
  **/ 
 
 int *imprimeaux(indvo *ppl, char semestre[4]){
-	int i,j;
+	int i;
 	aux = 0;
 	int a = ppl->qtd;
 	int *v = (int * )malloc(sizeof(int)*10);
@@ -804,14 +804,14 @@ int *imprimeaux2(indvo *ppl, int * v, char turn){
  
 void imprime(indvo *ppl){
 	
-	int a = ppl->qtd;
+	//int a = ppl->qtd;
 	int i,j,k;
 	int *v,*v2 ;
 	int ispar = 2;
 	
-	int flag =0;
+	//int flag =0;
 	for(i  = 0; i < qtdsem;i++){
-		j = 0;ispar = 2;k=0;flag = 0;
+		j = 0;ispar = 2;k=0;
 		printf("\nSemestre : %s\n", sm[i].se);
 		printf("---------------------------------------------------------------------------|\n");
 	   printf("|-----|  Segunda     |  Terça     |  Quarta     |  Quinta     |  Sexta     |\n");
@@ -959,9 +959,9 @@ indvo *criaIndv(indvo *ppl){
  **/ 
 indvo *cruzamento(indvo *ppl1, indvo *ppl2){
 
-	int outro,otr;
+	int outro;
 	int escolha;
-	int i,j,ki,k,out = 0;
+	int i,j,ki,out = 0;
 	indvo *novo;
 	genes *temp = (genes *)malloc(sizeof(genes)*150);
 	if(!temp)return NULL;
@@ -1219,11 +1219,11 @@ indvo *cruzamento(indvo *ppl1, indvo *ppl2){
 		if(!testaRestricao(*novo, dsa[ppl2->genes_indv[escolha].disc], 
 			novo->genes_indv[dv].dia_sem))return NULL;	
 		//puts("esc11");
-		for(ki = 0; k < novo->qtd;ki++){
-			if(novo->genes_indv[k].dia_sem == ppl2->genes_indv[escolha].dia_sem &&		
-				novo->genes_indv[k].disc == ppl2->genes_indv[escolha].disc &&
-				strcmp(novo->genes_indv[k].prof,ppl2->genes_indv[escolha].prof)==0)
-			return NULL;
+		for(ki = 0; ki < novo->qtd;ki++){
+			if(novo->genes_indv[ki].dia_sem == ppl2->genes_indv[escolha].dia_sem &&		
+				novo->genes_indv[ki].disc == ppl2->genes_indv[escolha].disc &&
+				strcmp(novo->genes_indv[ki].prof,ppl2->genes_indv[escolha].prof)==0)
+				return NULL;
 		
 		}
 		//for(ki = 0; ki < novo->qtd;ki++){
@@ -1269,10 +1269,10 @@ indvo *cruzamento(indvo *ppl1, indvo *ppl2){
 		if(!testaRestricao(*novo, dsa[ppl1->genes_indv[escolha].disc], 
 			novo->genes_indv[dv].dia_sem))return NULL;
 		
-		for(ki = 0; k < novo->qtd;ki++){
-			if(novo->genes_indv[k].dia_sem == ppl1->genes_indv[escolha].dia_sem &&		
-				novo->genes_indv[k].disc == ppl1->genes_indv[escolha].disc &&
-				strcmp(novo->genes_indv[k].prof,ppl1->genes_indv[escolha].prof)==0)
+		for(ki = 0; ki < novo->qtd;ki++){
+			if(novo->genes_indv[ki].dia_sem == ppl1->genes_indv[escolha].dia_sem &&		
+				novo->genes_indv[ki].disc == ppl1->genes_indv[escolha].disc &&
+				strcmp(novo->genes_indv[ki].prof,ppl1->genes_indv[escolha].prof)==0)
 			return NULL;
 		
 		}
@@ -1490,7 +1490,7 @@ int geraIndividuos(indvo *ppl, char *arq){
 
 
 	
-	int i,j,k,temp,flag = 0,turno,numsala;
+	int i,j,flag = 0,numsala;
 	int discomp = 0, distt,test;
 	//plcao *ppl = NULL;
 	
@@ -1545,8 +1545,7 @@ int geraIndividuos(indvo *ppl, char *arq){
 		if(x > 70){
 			return ERROINDIVIDUO;				
 		
-		}
-		int ll;		
+		}		
 		//srand(0);
 		j = rand() %qtddisc;
 		
@@ -1572,8 +1571,7 @@ int geraIndividuos(indvo *ppl, char *arq){
 		
 		distt = geraSala(auxsm,numsala);
 		
-		
-		int l;		
+				
 		
 		if(distt < 0)flag = 1;
 	
@@ -1738,7 +1736,7 @@ int eliminaPior(plcao *pop, indvo *ppl){
  * 
  **/
 int achaMelhor(plcao *pop){
-	int i,j,id = 0;
+	int i,id = 0;
 	int menor = 999;
 	for(i = 0; i < TAM_POPULACAO;i++){
 		if(pop->individuos[i].qtdpr + pop->individuos[i].choques < menor){
@@ -1832,7 +1830,6 @@ void freeMem(void *algo,int component){ /// Liberar memoria alocadas de cada est
 //Função principal
 int main(int argc, char *argv[ ] ){
 	int i,j;
-	int sp,pp;
 
 	plcao *populacao;
 	indvo *new;

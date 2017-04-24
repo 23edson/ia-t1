@@ -56,7 +56,7 @@ int auxF(int *v, int tam){
 int *geraSequencia(int *v, int tam){
 
 	int i,j;
-	int r,r1;
+	int r;
 	srand(time(NULL));
 	int *m = (int *)malloc(sizeof(int)*tam);
 	int *v1 = (int *)malloc(sizeof(int)*tam);
@@ -95,9 +95,8 @@ int *geraSequencia(int *v, int tam){
  **/ 
 prof_aux *leProfessores(char arq[20]){
 	int qtd =0;
-	int ii,k,j,i;
-	char a[6];
-	char aux;
+	int ii,k,j;
+
 	char *t = (char *)malloc(sizeof(char)*20);	
 	if(!t) {printf("Alocacao professores t"); return NULL;}
 	FILE *arqi;
@@ -194,7 +193,7 @@ disc_aux *leDisciplina(char arq[20]){
 
 	FILE *arqi;
 	disc_aux *discc;
-	int i,j,k;
+	int i,j;
 	char *t = (char *)malloc(sizeof(char)*5);	
 	if(!t) { printf("Alocacao disciplina t  "); return NULL;}
 	char *t2 = (char *)malloc(sizeof(char)*5);	
