@@ -24,6 +24,9 @@
 #define UM_PONTO 1
 #define DOIS_PONTOS 2
 #define QUATRO_PONTOS 4
+//freeMem para os ponteiros globais do ag.c
+#define VARGLOBAIS 111
+
 
 int manha[10] = {0,1,2,3,4,5,6,7,8,9};
 int tarde[10] = {10,11,12,13,14,15,16,17,18,19};
@@ -34,10 +37,10 @@ int aux;
 int par,impar;
 int contador = 0;
 //Variaveis comuns
-prof_aux *pf;
-semestre *sm;
-disc_aux *dsa;
-semestre *auxsm;
+prof_aux *pf    = NULL;
+semestre *sm    = NULL;
+disc_aux *dsa   = NULL;
+semestre *auxsm = NULL;
 
 /**
  * @function avaliacao
@@ -366,15 +369,19 @@ int achaProf(prof_aux *pf, char *nome){
  **/
 
 semestre *copiaEst(semestre *ss){
-
-	semestre *aux;
+	if(!ss) return NULL;
+	semestre *aux = NULL;
 	int i,j;
 	aux = (semestre *)malloc(sizeof(semestre)*qtdsem);
+	if(!aux) return NULL;
 	for(i = 0 ; i < qtdsem;i++){
 		strcpy(aux[i].se,ss[i].se);
 		aux[i].num = ss[i].num;
 		aux[i].sala = ss[i].sala;
+		aux[i].horarios = NULL;
 		aux[i].horarios = (int *)malloc(sizeof(int)*aux[i].num);
+		if(!aux[i].horarios){
+			freeMem(aux,SEMESTRE); return NULL;}
 		for( j = 0; j < aux[i].num;j++)
 			aux[i].horarios[j] = ss[i].horarios[j];
 	}	
@@ -803,10 +810,15 @@ int *imprimeaux2(indvo *ppl, int * v, char turn){
  **/ 
  
 void imprime(indvo *ppl){
+<<<<<<< HEAD
 	
 	//int a = ppl->qtd;
+=======
+	if(!ppl){ printf("individuo NULL:void imprime"); return;}
+	int a = ppl->qtd;
+>>>>>>> f3b877d4c264b34417cd512d826ddd4678335b66
 	int i,j,k;
-	int *v,*v2 ;
+	int *v = NULL,*v2 = NULL ;
 	int ispar = 2;
 	
 	//int flag =0;
@@ -912,25 +924,37 @@ void imprime(indvo *ppl){
  **/ 
 indvo *criaIndv(indvo *ppl){
 
-	indvo *nv;
+	indvo *nv      = NULL;
 	int i,j;
-	nv = (indvo *)malloc(sizeof(indvo));
-	nv->qtd = ppl->qtd;
-	nv->qtdpr = ppl->qtdpr;
-	nv->choques = ppl->choques;
+	nv             = (indvo *)malloc(sizeof(indvo));
+	if(!nv)   
+		return NULL;// verificacao
+	nv->genes_indv = NULL;
+	nv->qtd        = ppl->qtd;
+	nv->qtdpr      = ppl->qtdpr;
+	nv->choques    = ppl->choques;
 	nv->genes_indv = (genes *)malloc(sizeof(genes)*150);
+	if(!nv->genes_indv){ 
+		freeMem(nv,INDVO); return NULL;}
 	for(i = 0; i < ppl->qtd;i++){
 		nv->genes_indv[i].dia_sem = ppl->genes_indv[i].dia_sem;
-		nv->genes_indv[i].prof = (char *)malloc(sizeof(char)*20);
+		nv->genes_indv[i].prof    = NULL;
+		nv->genes_indv[i].prof    = (char *)malloc(sizeof(char)*20);
+		if(!nv->genes_indv[i].prof){
+			freeMem(nv,INDVO); return NULL;}
 		strcpy(nv->genes_indv[i].prof,ppl->genes_indv[i].prof);
+		nv->genes_indv[i].notpref = NULL;
 		nv->genes_indv[i].notpref = (int *)malloc(sizeof(int)*ppl->genes_indv[i].numpref);
+		if(!nv->genes_indv[i].notpref){
+			freeMem(nv,INDVO); return NULL;}
+		
 		for(j = 0; j < ppl->genes_indv[i].numpref;j++){
 			nv->genes_indv[i].notpref[j] = ppl->genes_indv[i].notpref[j]; 		
 		
 		}
 		nv->genes_indv[i].numpref = ppl->genes_indv[i].numpref;
-		nv->genes_indv[i].disc = ppl->genes_indv[i].disc;
-		nv->genes_indv[i].sala = ppl->genes_indv[i].sala;
+		nv->genes_indv[i].disc    = ppl->genes_indv[i].disc;
+		nv->genes_indv[i].sala    = ppl->genes_indv[i].sala;
 		nv->genes_indv[i].sala_id = ppl->genes_indv[i].sala_id;
 		nv->genes_indv[i].periodo = ppl->genes_indv[i].periodo;
 		strcpy(nv->genes_indv[i].sem, ppl->genes_indv[i].sem);
@@ -958,11 +982,20 @@ indvo *criaIndv(indvo *ppl){
  * 
  **/ 
 indvo *cruzamento(indvo *ppl1, indvo *ppl2){
+<<<<<<< HEAD
 
 	int outro;
 	int escolha;
 	int i,j,ki,out = 0;
 	indvo *novo;
+=======
+	if(!ppl1) return NULL;
+	if(!ppl2) return NULL;
+	int outro,otr;
+	int escolha;
+	int i,j,ki,k,out = 0;
+	indvo *novo = NULL;
+>>>>>>> f3b877d4c264b34417cd512d826ddd4678335b66
 	genes *temp = (genes *)malloc(sizeof(genes)*150);
 	if(!temp)return NULL;
 	
@@ -1331,7 +1364,8 @@ indvo *cruzamento(indvo *ppl1, indvo *ppl2){
 	//free(novo->genes_indv[ki].prof);
 	//novo->genes_indv[ki].prof = (char *)malloc(sizeof(char)*20);
 	strcpy(novo->genes_indv[ki].prof,temp->prof);//puts(temp->prof);
-	free(novo->genes_indv[ki].notpref);//puts("inde6");
+	if(novo->genes_indv[ki].notpref != NULL)
+		free(novo->genes_indv[ki].notpref);//puts("inde6");
 	novo->genes_indv[ki].notpref = NULL;
 	novo->genes_indv[ki].notpref = (int *)malloc(sizeof(int)*temp->numpref);//puts("inde7");
 	for(j = 0;  j < temp->numpref;j++)
@@ -1380,7 +1414,7 @@ indvo *cruzamento(indvo *ppl1, indvo *ppl2){
  * 
  **/ 
 int mutacao(indvo *ppl){
-
+	if(!ppl) return ERROINDIVIDUO;
 	int r = rand() % ppl->qtd;
 	
 	int numsala;
@@ -1390,6 +1424,7 @@ int mutacao(indvo *ppl){
 	
 	//if(!sm) return ERRONALEITURA;
 	auxsm = copiaEst(sm);
+	if(!auxsm) return ERROALOCACAO;
 	if(strcmp(ppl->genes_indv[r].sem,"V1")==0){
 			numsala = achaSala(ppl->genes_indv[r].sem);
 	}
@@ -1498,34 +1533,34 @@ int geraIndividuos(indvo *ppl, char *arq){
 	ppl->choques = 0;
 	ppl->qtdpr = 0;
 	ppl->genes_indv = (genes *)malloc(sizeof(genes)*150);
-	if(!ppl->genes_indv)return ERROALOCACAO;
-	
+	if(!ppl->genes_indv){ freeMem(auxsm,VARGLOBAIS); return ERROALOCACAO;}
+	for(i=0;i<150;i++){ppl->genes_indv[i].prof = NULL; ppl->genes_indv[i].notpref = NULL;}
 	
 	
 	//Lê apenas uma vez, porque estas structs são usadas em outras funções depois.
 	if(primeiro){
 		pf = leProfessores(arq);	
+		if(!pf){freeMem(ppl,INDVO); return ERROALOCACAO;} // deve ficar junto, assim não sera usado se for invalido.
 		sm = leSemestre(arq);
+		if(!sm){freeMem(ppl,INDVO); freeMem(pf,VARGLOBAIS); return ERROALOCACAO;}
 		dsa = leDisciplina(arq);
+		if(!dsa){freeMem(ppl,INDVO); freeMem(sm,VARGLOBAIS); return ERROALOCACAO;}
 		primeiro = 0;
 	}
 	
 
-	if(!pf){freeMem(ppl,INDVO); return ERROALOCACAO;}
 	//sm = leSemestre(arq);
-	if(!sm){freeMem(ppl,INDVO); freeMem(pf,PROF_AUX); return ERROALOCACAO;}
 	//dsa = leDisciplina(arq);//nao tem pra que retirar essa linha sendo que essa variavel, nao e global e esta sendo usada nos strcmp abaixo.
-	if(!dsa){freeMem(ppl,INDVO); freeMem(pf,PROF_AUX);  freeMem(sm,SEMESTRE); return ERROALOCACAO;}
 	auxsm = copiaEst(sm);
-	if(!auxsm){freeMem(ppl,INDVO); freeMem(pf,PROF_AUX);  freeMem(sm,SEMESTRE);  freeMem(dsa,DISC_AUX); return ERROALOCACAO;}
+	if(!auxsm){freeMem(ppl,INDVO); freeMem(dsa,VARGLOBAIS); return ERROALOCACAO;}
 
 	
 	auxsm = copiaEst(sm);
 		
 	
 	int *v = (int *)malloc(sizeof(int)*qtddisc);
-	if(!v){freeMem(ppl,INDVO);freeMem(pf,PROF_AUX);freeMem(sm,SEMESTRE);freeMem(dsa,DISC_AUX);freeMem(auxsm,SEMESTRE); return ERROALOCACAO;}
-	
+	if(!v){freeMem(ppl,INDVO); freeMem(auxsm,VARGLOBAIS); return ERROALOCACAO;}
+	//aqui ja começa a ficar grande as liberações
 	for(i =0 ; i < qtddisc;i++){
 		v[i] = dsa[i].periodo; 
 	//	printf("%d ", v[i]);
@@ -1543,6 +1578,7 @@ int geraIndividuos(indvo *ppl, char *arq){
 		//caso execução ultrapasse 70 passos, a geração é abortada,
 		//pois o mesmo é inválido.
 		if(x > 70){
+			freeMem(ppl,INDVO);
 			return ERROINDIVIDUO;				
 		
 		}		
@@ -1766,6 +1802,26 @@ void freeMem(void *algo,int component){ /// Liberar memoria alocadas de cada est
 		return;
 	}
 	switch(component) {
+		case VARGLOBAIS :{   /// ponteiros globais "pf","sm","dsa","auxsm"
+			if(pf != NULL){
+				if(sm != NULL){
+					if(dsa != NULL){
+						if(auxsm != NULL){
+							freeMem(auxsm,SEMESTRE);
+						}
+						freeMem(dsa,DISC_AUX);
+					}
+					freeMem(sm,SEMESTRE);
+				}
+				freeMem(pf,PROF_AUX);
+			}
+			else if(auxsm != NULL){
+				freeMem(auxsm,SEMESTRE);
+			}
+			else
+				printf("ponteiros globais nao possuem memoria alocada\n");
+			break;
+		}
 		case DISC_AUX :{   /// "disc_aux"
 			disc_aux *a = (disc_aux *)algo;
 			for(i=0;i<qtddisc;i++)
@@ -1805,7 +1861,8 @@ void freeMem(void *algo,int component){ /// Liberar memoria alocadas de cada est
 		case INDVO:{   /// "indvo"
 			indvo *a = (indvo *)algo;
 			for(i=0;i<TAM_POPULACAO;i++)
-				freeMem(a[i].genes_indv,GENES);
+				if(a[i].genes_indv != NULL)
+					freeMem(a[i].genes_indv,GENES);
 			free(a);
 			break;
 		}
@@ -1820,7 +1877,7 @@ void freeMem(void *algo,int component){ /// Liberar memoria alocadas de cada est
 			free(a);
 			break;
 		}
-		default:{
+		default:{ /// essa funcão não será usada para liberar variaveis normais que só necessitam de um unico "free('var')";
 			printf("Componente nao identificado");
 			break;
 		}
@@ -1831,15 +1888,17 @@ void freeMem(void *algo,int component){ /// Liberar memoria alocadas de cada est
 int main(int argc, char *argv[ ] ){
 	int i,j;
 
-	plcao *populacao;
-	indvo *new;
-	populacao = (plcao *)malloc(sizeof(plcao));
+	plcao *populacao = NULL;
+	indvo *new       = NULL;
+	populacao        = (plcao *)malloc(sizeof(plcao));
 	if(!populacao)return ERROALOCACAO;
 	
+	populacao->individuos = NULL;
 	populacao->individuos = (indvo *)malloc(sizeof(indvo)*TAM_POPULACAO);
-	if(!populacao->individuos)return ERROALOCACAO;
+	if(!populacao->individuos){ freeMem(populacao,PLCAO); return ERROALOCACAO; }
 	
 	for(i = 0 ; i < TAM_POPULACAO;){
+		populacao->individuos[i].genes_indv = NULL;
 		if(geraIndividuos(&populacao->individuos[i],argv[1])==OK){i++;}
 	
 		
