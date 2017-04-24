@@ -1520,7 +1520,6 @@ int mutacao(indvo *ppl){
 int geraIndividuos(indvo *ppl, char *arq){
 
 
-	
 	int i,j,k,temp,flag = 0,turno,numsala;
 	int discomp = 0, distt,test;
 	//plcao *ppl = NULL;
@@ -1574,7 +1573,7 @@ int geraIndividuos(indvo *ppl, char *arq){
 		//caso execução ultrapasse 70 passos, a geração é abortada,
 		//pois o mesmo é inválido.
 		if(x > 70){
-			freeMem(ppl,INDVO);
+			freeMem(ppl->genes_indv,GENES);
 			return ERROINDIVIDUO;				
 		
 		}
