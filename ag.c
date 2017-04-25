@@ -1443,19 +1443,20 @@ int geraIndividuos(indvo *ppl, char *arq){
 	//Lê apenas uma vez, porque estas structs são usadas em outras funções depois.
 	if(primeiro){
 		pf = leProfessores(arq);	
-		if(!pf){freeMem(ppl,INDVO); return ERROALOCACAO;} // deve ficar junto, assim não sera usado se for invalido.
+		if(!pf){freeMem(ppl->genes_indv,GENES); return ERROALOCACAO;} // deve ficar junto, assim não sera usado se for invalido.
 		sm = leSemestre(arq);
-		if(!sm){freeMem(ppl,INDVO); freeMem(pf,VARGLOBAIS); return ERROALOCACAO;}
+		if(!sm){freeMem(ppl->genes_indv,GENES); freeMem(pf,VARGLOBAIS); return ERROALOCACAO;}
 		dsa = leDisciplina(arq);
-		if(!dsa){freeMem(ppl,INDVO); freeMem(sm,VARGLOBAIS); return ERROALOCACAO;}
+		if(!dsa){freeMem(ppl->genes_indv,GENES); freeMem(sm,VARGLOBAIS); return ERROALOCACAO;}
 		primeiro = 0;
 		printf("Geraindv 2 - globais\n");
-		auxsm = copiaEst(sm);
-		if(!auxsm){freeMem(ppl,INDVO); freeMem(dsa,VARGLOBAIS); return ERROALOCACAO;}
-		printf("Geraindv 3 auxsm\n");
 	}
+	freeMem(auxsm,SEMESTRE);
+	auxsm = NULL;
+	auxsm = copiaEst(sm);
+	if(!auxsm){freeMem(ppl,INDVO); freeMem(dsa,VARGLOBAIS); return ERROALOCACAO;}
+	printf("Geraindv 3 auxsm\n");
 	
-
 	//sm = leSemestre(arq);
 	//dsa = leDisciplina(arq);//nao tem pra que retirar essa linha sendo que essa variavel, nao e global e esta sendo usada nos strcmp abaixo.
 	
@@ -1464,7 +1465,7 @@ int geraIndividuos(indvo *ppl, char *arq){
 		
 	
 	int *v = (int *)malloc(sizeof(int)*qtddisc);
-	if(!v){freeMem(ppl,INDVO); freeMem(auxsm,VARGLOBAIS); return ERROALOCACAO;}
+	if(!v){freeMem(&ppl->genes_indv,GENES); freeMem(auxsm,VARGLOBAIS); return ERROALOCACAO;}
 	//aqui ja começa a ficar grande as liberações
 	for(i =0 ; i < qtddisc;i++){
 		v[i] = dsa[i].periodo; 
@@ -1511,9 +1512,8 @@ int geraIndividuos(indvo *ppl, char *arq){
 		}
 		
 		
-		//printf("Geraindv 5 While passa dsa[j].cod_sem\n");
 		distt = geraSala(auxsm,numsala);
-		
+		printf("Geraindv 5 While passa geraSala %d numSala: %d\n",distt,numsala);
 		if(distt < 0)flag = 1;
 	
 		if(!testaRestricao(*ppl, dsa[j], auxsm[numsala].horarios[distt])){
