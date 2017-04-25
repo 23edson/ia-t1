@@ -1437,6 +1437,7 @@ int geraIndividuos(indvo *ppl, char *arq){
 	ppl->genes_indv = (genes *)malloc(sizeof(genes)*150);
 	if(!ppl->genes_indv){ freeMem(auxsm,VARGLOBAIS); return ERROALOCACAO;}
 	for(i=0;i<150;i++){ppl->genes_indv[i].prof = NULL; ppl->genes_indv[i].notpref = NULL;}
+	printf("Geraindv 1\n");
 	
 	
 	//Lê apenas uma vez, porque estas structs são usadas em outras funções depois.
@@ -1448,14 +1449,16 @@ int geraIndividuos(indvo *ppl, char *arq){
 		dsa = leDisciplina(arq);
 		if(!dsa){freeMem(ppl,INDVO); freeMem(sm,VARGLOBAIS); return ERROALOCACAO;}
 		primeiro = 0;
+		printf("Geraindv 2 - globais\n");
+		auxsm = copiaEst(sm);
+		if(!auxsm){freeMem(ppl,INDVO); freeMem(dsa,VARGLOBAIS); return ERROALOCACAO;}
+		printf("Geraindv 3 auxsm\n");
 	}
 	
 
 	//sm = leSemestre(arq);
 	//dsa = leDisciplina(arq);//nao tem pra que retirar essa linha sendo que essa variavel, nao e global e esta sendo usada nos strcmp abaixo.
-	auxsm = copiaEst(sm);
-	if(!auxsm){freeMem(ppl,INDVO); freeMem(dsa,VARGLOBAIS); return ERROALOCACAO;}
-
+	
 	
 	//auxsm = copiaEst(sm);
 		
@@ -1466,7 +1469,8 @@ int geraIndividuos(indvo *ppl, char *arq){
 	for(i =0 ; i < qtddisc;i++){
 		v[i] = dsa[i].periodo; 
 	} 
-
+	printf("Geraindv 4 v\n");
+	
 	
 	discomp = testaParada(v);
 	srand(time(NULL) + contador);
@@ -1474,7 +1478,8 @@ int geraIndividuos(indvo *ppl, char *arq){
 	int x = 0;
 	
 	while(discomp){
-		//Escolhe disciplina aleatoria
+		//printf("Geraindv 5 entra While\n");
+			//Escolhe disciplina aleatoria
 	
 		//caso execução ultrapasse 70 passos, a geração é abortada,
 		//pois o mesmo é inválido.
@@ -1506,12 +1511,14 @@ int geraIndividuos(indvo *ppl, char *arq){
 		}
 		
 		
+		//printf("Geraindv 5 While passa dsa[j].cod_sem\n");
 		distt = geraSala(auxsm,numsala);
 		
 		if(distt < 0)flag = 1;
 	
 		if(!testaRestricao(*ppl, dsa[j], auxsm[numsala].horarios[distt])){
-			
+				printf("Geraindv 5 While testaRestri\n");
+
 				int dfi;
 			
 			
@@ -1524,12 +1531,15 @@ int geraIndividuos(indvo *ppl, char *arq){
 		}
 		
 		for(i = 0; i < ppl->qtd;i++){
+			//printf("Geraindv 5 While entra For ppl->qtd\n");
 			if(ppl->genes_indv[i].dia_sem == auxsm[numsala].horarios[distt] &&
 				strcmp(ppl->genes_indv[i].prof,dsa[j].nome)==0){
+				printf("Geraindv 5 While entra For IF\n");
 				int dfi;				
-				for(dfi = 0; dfi < auxsm[numsala].num;dfi++)
+				for(dfi = 0; dfi < auxsm[numsala].num;dfi++){
+					printf("Geraindv 5 While For IF entra For dfi++\n");
 				if((auxsm[numsala].horarios[dfi] != auxsm[numsala].horarios[distt]) &&
-					auxsm[numsala].horarios[dfi] >= 0){distt = dfi;break;}			
+					auxsm[numsala].horarios[dfi] >= 0){distt = dfi;break;}}			
 						
 				if(dfi!=distt)flag = 1;	
 					
@@ -1537,7 +1547,7 @@ int geraIndividuos(indvo *ppl, char *arq){
 			}		
 		
 			else if(ppl->genes_indv[i].dia_sem == auxsm[numsala].horarios[distt] &&
-			strcmp(dsa[j].cod_sem,ppl->genes_indv[i].sem)==0){puts("oi");flag = 1; ;}
+			strcmp(dsa[j].cod_sem,ppl->genes_indv[i].sem)==0){printf("Geraindv 5 While entra For ELSE IF\n");flag = 1;}
 			
 			
 			/*else if(ppl->individuos[0]->genes_ind[i].dia_sem == temp &&
@@ -1547,20 +1557,22 @@ int geraIndividuos(indvo *ppl, char *arq){
 		
 		}
 		if(!flag){
+			//printf("Geraindv 5 While entra FLAG\n");
 			
 			ppl->genes_indv[ppl->qtd].dia_sem = auxsm[numsala].horarios[distt];
 			ppl->genes_indv[ppl->qtd].prof = (char *)malloc(sizeof(char)*20);
 			if(!ppl->genes_indv[ppl->qtd].prof)return ERROALOCACAO;
 				
 			strcpy(ppl->genes_indv[ppl->qtd].prof,dsa[j].nome);
-						
+			printf("Geraindv 5 While entra FLAG %d\n",ppl->qtd);
 			test = achaProf(pf,dsa[j].nome);
 			ppl->genes_indv[ppl->qtd].notpref = NULL;		
 			ppl->genes_indv[ppl->qtd].notpref = 
 					copiaVetor(ppl->genes_indv[ppl->qtd].notpref,
 					pf[test].horarios, pf[test].num);		
-			if(!ppl->genes_indv[ppl->qtd].notpref)
-				return ERROALOCACAO;		
+			if(!ppl->genes_indv[ppl->qtd].notpref){
+				printf("Geraindv 5 While FLAG !notpref\n");	return ERROALOCACAO;}
+			printf("Geraindv 5 While FLAG notpref OK\n");
 			ppl->genes_indv[ppl->qtd].numpref = pf[test].num;
 			ppl->genes_indv[ppl->qtd].disc = j;
 			ppl->genes_indv[ppl->qtd].sala = sm[numsala].sala;
@@ -1601,16 +1613,17 @@ int geraIndividuos(indvo *ppl, char *arq){
 		}
 		else flag = 0;
 		
+		printf("Geraindv 5 While sai FLAG\n");
 		
 			
 		x++;
 		
 	}
-	
+	printf("Geraindv 5 sai While\n");
 	quicksort2(ppl->genes_indv,0,ppl->qtd-1);
-	
+	printf("Geraindv 6 sai quicksort2\n");
 	avaliacao(ppl);
-	
+	printf("Geraindv 7 sai avaliacao\n");
 	return OK;
 }
 
@@ -1758,7 +1771,7 @@ void freeMem(void *algo,int component){ /// Liberar memoria alocadas de cada est
 		}	
 		case PLCAO:{   /// "plcao"
 			plcao *a = (plcao *)algo;
-			freeMem(a->individuos,INDVO);
+			freeMem(&a->individuos,INDVO);
 			free(a);
 			a=NULL;
 			break;
@@ -1800,19 +1813,25 @@ int main(int argc, char *argv[ ] ){
 	indvo *new       = NULL;
 	populacao        = (plcao *)malloc(sizeof(plcao));
 	if(!populacao)return ERROALOCACAO;
-	
+	printf("plcao 1\n");
 	populacao->individuos = NULL;
 	populacao->individuos = (indvo *)malloc(sizeof(indvo)*TAM_POPULACAO);
 	if(!populacao->individuos){ freeMem(populacao,PLCAO); return ERROALOCACAO; }
+	printf("indvo 1\n");
 	
 	for(i = 0 ; i < TAM_POPULACAO;){
+		printf("for 1-i: %d\n",i);
 		populacao->individuos[i].genes_indv = NULL;
 		if(geraIndividuos(&populacao->individuos[i],argv[1])==OK){i++;}
-		
+		else{ for(;i>=0;i--) freeMem(&populacao->individuos[i],INDVO); break;}
 	}
+	printf("saiu for 1");
+	
 	srand(time(NULL));
 	for(i = 0 ; i < GERACOES;i++){
+		printf("for 2-i: %d\n",i);
 		for(j = 0; j < TORNEIO;j++){
+			printf("for 2-j: %d\n",j);
 			double prob = ((double) rand() / ((double)RAND_MAX+1));
 			if(prob < PROBCRUZAMENTO){
 				int ind1 = rand() % TAM_POPULACAO;
@@ -1837,10 +1856,12 @@ int main(int argc, char *argv[ ] ){
 			}
 		}
 	}
+	printf("saiu for 2");
+	
 	//Procura individuo com melhor fitness
 	int id = achaMelhor(populacao);
 	imprime(&populacao->individuos[id]);
-	
-
+	printf("finalizou");
+	freeMem(populacao,PLCAO);
 	return 0;
 }
